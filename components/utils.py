@@ -177,7 +177,7 @@ def generate_map_figure(
     selected_oblast: str | None = None,
     click_data: dict[str, Any] | None = None,
     reset: bool = False,
-    outer_ukraine: gpd.GeoDataFrame | None = None
+    outer_ukraine: gpd.GeoDataFrame | None = None,
 ) -> go.Figure:
     """
     Build Mapbox figure with priority.

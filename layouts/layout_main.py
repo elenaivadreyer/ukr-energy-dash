@@ -5,7 +5,6 @@ This module defines the main layout structure, components, and UI elements
 for the Ukraine Energy Dashboard including headers, footers, and content areas.
 """
 
-
 from dash import dash_table, dcc, html
 
 unique_oblasts = [

@@ -36,17 +36,17 @@ The dashboard integrates data from multiple sources:
 ukr_energy_dash/
 ├── app.py                 # Main Dash application
 ├── assets/                # Static files and data
-│   ├── data/             # Processed geospatial data files
-│   └── styles.css        # Custom styling
+│   ├── data/              # Processed geospatial data files
+│   └── styles.css         # Custom styling
 ├── components/            # Reusable UI components
 │   ├── __init__.py
-│   └── utils.py          # Map utilities and station details
+│   └── utils.py           # Map utilities and station details
 ├── layouts/               # Page layouts and UI structure
 │   ├── __init__.py
-│   └── layout_main.py    # Main dashboard layout
+│   └── layout_main.py     # Main dashboard layout
 ├── data/                  # Data processing pipeline
 │   ├── __init__.py
-│   └── process.py        # OSM data processing and GPPD matching
+│   └── process.py         # OSM data processing and GPPD matching
 └── requirements.txt       # Package dependencies
 ```
 

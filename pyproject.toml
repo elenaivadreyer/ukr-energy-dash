@@ -132,6 +132,7 @@ select = [
 
 #Ignoring specific rule codes
 ignore = [
+    "PLR0913", #Too many arguments in function/method (pylint) --> max-args configured below to 5 (default 5, pylint default 10)
     "E501", #line length handled globally
     "T201", #print statement allowed for debugging purposes
     "E722", #Do not use bare except (ignored in previous template version)

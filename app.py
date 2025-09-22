@@ -123,7 +123,7 @@ def update_map(
     relayout_data: dict[str, Any] | None,
     selected_data: dict[str, Any] | None,
     gppd_store: dict[str, bool],
-    store_data: dict[str, Any] | None
+    store_data: dict[str, Any] | None,
 ) -> dict[str, Any]:
     """
     Update the map visualization based on user interactions and filters.
@@ -211,9 +211,7 @@ def update_map(
     prevent_initial_call=False,
 )
 def update_station_details(
-    click_data: dict[str, Any] | None,
-    relayout_data: dict[str, Any] | None,
-    selected_oblast: str | None
+    click_data: dict[str, Any] | None, relayout_data: dict[str, Any] | None, selected_oblast: str | None
 ) -> html.Div | str:
     """
     Update station details panel based on map clicks and interactions.
@@ -246,9 +244,7 @@ def update_station_details(
     prevent_initial_call=False,
 )
 def update_table(
-    selected_oblast: str | None,
-    gppd_filter: dict[str, bool] | None,
-    selected_data: dict[str, Any] | None
+    selected_oblast: str | None, gppd_filter: dict[str, bool] | None, selected_data: dict[str, Any] | None
 ) -> list[dict[str, Any]]:
     """
     Update the stations table based on filters and selections.
