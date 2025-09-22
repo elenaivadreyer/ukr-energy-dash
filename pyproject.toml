@@ -3,9 +3,9 @@ requires = ["setuptools >= 69.1.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "data_template_project_name"
-version = "0.0.1.dev6"
-description = "project_description"
+name = "ukr_energy_dash"
+version = "0.1.0"
+description = "Ukraine Energy Dashboard - A Plotly Dash application for visualizing Ukraine energy data"
 readme = "README.md"
 authors = [
     {name = "Elena Dreyer", email = "elenaivadreyer@gmail.com"},
@@ -20,8 +20,11 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    'dash>=3.0.0',
+    'plotly>=5.0.0',
+    'pandas>=2.0.0',
+    'numpy>=1.20.0',
     'openpyxl==3.1.2', # NOTE: necessary for pd.read_excel()
-    'pandas==2.1.4', # NOTE: 2.2.0 does not work with data_df.to_sql()! [02.02.2024]
     'requests==2.31.0',
     'sqlalchemy==1.4.51',
     'bs4==0.0.2',
@@ -63,9 +66,9 @@ test = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/author_name/data_template_project_name/tree/main#readme"
-Source = "https://github.com/author_name/data_template_project_name"
-Tracker = "https://github.com/author_name/data_template_project_name/issues"
+Documentation = "https://github.com/elenaivadreyer/ukr_energy_dash/tree/main#readme"
+Source = "https://github.com/elenaivadreyer/ukr_energy_dash"
+Tracker = "https://github.com/elenaivadreyer/ukr_energy_dash/issues"
 
 #Global ruff configuration
 [tool.ruff]
