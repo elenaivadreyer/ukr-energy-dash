@@ -174,7 +174,7 @@ def get_main_content_with_oblast(unique_oblasts):
                     n_clicks=0,
                     className="download-btn minimal-btn",
                 ),
-                style={"marginTop": "10px", "textAlign": "left"},  # ensures it's below table
+                style={"marginTop": "10px", "textAlign": "left", "float": "none"},  # ensures it's below table, left-aligned
             ),
             dcc.Download(id="download-data"),
         ],
