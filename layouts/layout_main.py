@@ -1,3 +1,11 @@
+"""
+Main layout components for Ukraine Energy Dashboard.
+
+This module defines the main layout structure, components, and UI elements
+for the Ukraine Energy Dashboard including headers, footers, and content areas.
+"""
+
+
 from dash import dash_table, dcc, html
 
 unique_oblasts = [
@@ -32,7 +40,14 @@ unique_oblasts = [
 
 
 # ---------------- Header ---------------- #
-def get_header_with_buttons():
+def get_header_with_buttons() -> html.Div:
+    """
+    Create the header section with title and navigation buttons.
+
+    Returns:
+        Dash HTML Div containing the dashboard header
+
+    """
     return html.Div(
         children=[
             html.Div(
@@ -47,7 +62,14 @@ def get_header_with_buttons():
 
 
 # ---------------- Footer ---------------- #
-def get_footer():
+def get_footer() -> html.Div:
+    """
+    Create the footer section with links and credits.
+
+    Returns:
+        Dash HTML Div containing the dashboard footer
+
+    """
     return html.Div(
         children=[
             html.Div(
@@ -67,7 +89,17 @@ def get_footer():
     )
 
 
-def get_main_content_with_oblast(unique_oblasts):
+def get_main_content_with_oblast(unique_oblasts: list[str]) -> html.Div:
+    """
+    Create the main content area with sidebar and map components.
+
+    Args:
+        unique_oblasts: List of oblast names for the dropdown filter
+
+    Returns:
+        Dash HTML Div containing the main dashboard content
+
+    """
     # Sidebar
     sidebar_content = html.Div(
         [
@@ -227,7 +259,17 @@ def get_main_content_with_oblast(unique_oblasts):
 
 
 # ---------------- Main Layout ---------------- #
-def get_main_layout(unique_oblasts):
+def get_main_layout(unique_oblasts: list[str]) -> html.Div:
+    """
+    Create the complete main layout for the dashboard.
+
+    Args:
+        unique_oblasts: List of oblast names for the dropdown filter
+
+    Returns:
+        Dash HTML Div containing the complete dashboard layout
+
+    """
     return html.Div(
         [
             html.Div(children=[get_header_with_buttons()], className="header"),

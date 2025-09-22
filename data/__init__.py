@@ -1,5 +1,10 @@
-"""Data module for Ukraine Energy Dashboard"""
+"""
+Data module for Ukraine Energy Dashboard.
 
-from .data_loader import DataLoader
+This module provides data processing and loading utilities for the Ukraine Energy Dashboard.
+"""
 
-__all__ = ["DataLoader"]
+# Note: DataLoader module not yet implemented
+# from .data_loader import DataLoader
+
+__all__ = []  # ["DataLoader"]
