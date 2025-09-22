@@ -8,9 +8,9 @@ version = "0.0.1.dev6"
 description = "project_description"
 readme = "README.md"
 authors = [
-    {name = "Triin Tamra", email = "triin.tamra@bmwk.bund.de"},
+    {name = "Elena Dreyer", email = "elenaivadreyer@gmail.com"},
 ]
-maintainers = [{name = "Triin Tamra", email = "triin.tamra@bmwk.bund.de"}]
+maintainers = [{name = "Elena Dreyer", email = "elenaivadreyer@gmail.com"}]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
