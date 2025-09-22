@@ -1,16 +1,88 @@
-# data_template_project_name
+# Ukraine Energy Dashboard
 
-#### project_description
+A Plotly Dash application for visualizing and monitoring Ukraine's energy infrastructure data.
+
+## Overview
+
+This dashboard provides real-time monitoring and analysis of Ukraine's energy production and consumption patterns. Built with Plotly Dash, it offers interactive visualizations and key performance indicators for energy infrastructure monitoring.
+
+## Features
+
+- **Real-time energy production monitoring**
+- **Energy consumption tracking and analysis** 
+- **Historical data visualization**
+- **Energy mix breakdown by source (renewable, nuclear, thermal)**
+- **Interactive charts and graphs**
+- **Key performance indicators dashboard**
+- **Responsive web interface**
+
+## Quick Start
+
+1. **Install dependencies:**
+   ```bash
+   pip install -e .
+   ```
+
+2. **Run the dashboard:**
+   ```bash
+   python app.py
+   ```
+
+3. **Access the dashboard:**
+   Open your browser and navigate to `http://localhost:8050`
+
+## Project Structure
 
 ```
-The user/developer writes a brief introduction about the project repository here.
-What modules it consists of, what for, and any hints/tips that would help other
-users/developers to use this package.
+ukr_energy_dash/
+├── app.py                 # Main Dash application
+├── assets/               # CSS, JS, and static files
+│   └── style.css         # Custom styles
+├── data/                 # Data loading and processing
+│   ├── __init__.py
+│   ├── data_loader.py    # Data loading utilities
+│   └── energy_data.csv   # Sample data file
+├── layouts/              # UI layout components
+│   ├── __init__.py
+│   └── main_layout.py    # Main dashboard layout
+├── components/           # Reusable UI components
+│   ├── __init__.py
+│   └── ui_components.py  # Button, cards, dropdowns etc.
+├── callbacks/            # Dash callback functions
+│   ├── __init__.py
+│   └── chart_callbacks.py # Chart update callbacks
+├── src/ukr_energy_dash/  # Python package source
+└── tests/                # Test files
 ```
 
-How to use this package or its modules directly, please refer to [notebooks/sample_data_template_project_name.ipynb](./notebooks/sample_data_template_project_name.ipynb)
+## Usage
 
-If credentials are required in this package, please see `Required Credentials` and `Loading and Using Credentials` below.
+The dashboard runs on a single configurable port (default: 8050). You can set a custom port using the `PORT` environment variable:
+
+```bash
+PORT=8080 python app.py
+```
+
+## Data Sources
+
+Currently uses sample data for demonstration. In production, this would connect to real energy monitoring systems and databases.
+
+## Development
+
+1. **Install development dependencies:**
+   ```bash
+   pip install -e ".[test]"
+   ```
+
+2. **Run tests:**
+   ```bash
+   pytest tests/
+   ```
+
+3. **Code formatting:**
+   ```bash
+   ruff format .
+   ```
 
 ## How to use this Template
 This template is meant to assist to create a new repository project within DataLab-BMWK organization, keeping the files and folder structures as harmonious as possible in multiple project repositories. To create a project repository, all one needs is pretty much to define the name of a new repository project. The files will then be automatically updated to reflect this new name.
@@ -39,10 +111,17 @@ Here's some steps that you must do to successfully create a project repository f
 This test coverage includes tests needed for package `data_template_project_name`.
 
 ## Structure
-* `src/data_template_project_name`: this is considered a package as `data_template_project_name`.
-* `tests`: this is considered a test folder to test the contents of a package `data_template_project_name`. Please note, test folder and its subfolders must not have `__init__.py`.
-* `tests/test_data_template_project_name.py`: Example calls of the very package `data_template_project_name`.
-* If other modules are available, separate test files (one test file per module) are expected to be set up.
+
+This repository is structured as a Plotly Dash application with the following organization:
+
+* `app.py`: Main Dash application entry point
+* `assets/`: Static files (CSS, JS, images) served by Dash
+* `data/`: Data loading and processing modules
+* `layouts/`: UI layout components and page structures  
+* `components/`: Reusable UI components (buttons, cards, etc.)
+* `callbacks/`: Dash callback functions for interactivity
+* `src/ukr_energy_dash/`: Python package source code
+* `tests/`: Test files for application functionality
 
 ## Required Credentials
 Some services require credentials in order to be able to access to their data via API, for example. If there are names and steps, please list the variable names (in other words, secrets names) here such as:
