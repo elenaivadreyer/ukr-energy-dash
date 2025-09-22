@@ -51,7 +51,15 @@ def get_footer():
     return html.Div(
         children=[
             html.Div(
-                children=[html.Span("© 2025 Ukraine Power Stations Dashboard", className="info-footer")],
+                children=[
+                    html.A(
+                        html.I(className="fa-brands fa-github"),
+                        href="https://github.com/elenaivadreyer/ukr_energy_dash",
+                        target="_blank",
+                        className="github-link",
+                        style={"margin-left": "10px", "color": "#333", "text-decoration": "none"},
+                    ),
+                ],
                 className="info-container",
             )
         ],
@@ -68,8 +76,29 @@ def get_main_content_with_oblast(unique_oblasts):
                 className="description-container",
             ),
             html.Div(
-                [html.P("Select an oblast to view power stations and map details.", className="instructions")],
-                className="instructions-container",
+                [
+                    html.Small(
+                        [
+                            "Station locations were retrieved from ",
+                            html.A(
+                                "OpenStreetMap",
+                                href="https://www.openstreetmap.org/",
+                                target="_blank",
+                                className="note-link",
+                            ),
+                            " using a custom Overpass query. ",
+                            "These points were validated against the ",
+                            html.A(
+                                "Global Power Plant Database",
+                                href="https://datasets.wri.org/dataset/globalpowerplantdatabase",
+                                target="_blank",
+                                className="note-link",
+                            ),
+                            " through spatial proximity checks.",
+                        ]
+                    )
+                ],
+                className="data-note",
             ),
             # 🔹 Filters
             html.Div(
@@ -154,9 +183,20 @@ def get_main_content_with_oblast(unique_oblasts):
         children=[
             dash_table.DataTable(
                 id="stations-table",
-                columns=[{"name": c, "id": c} for c in ["station_name_en", "power", "plant:source", "oblast_name_en"]],
+                columns=[
+                    {"name": c, "id": c}
+                    for c in [
+                        "name",
+                        "station_name_en",
+                        "power",
+                        "plant:source",
+                        "plant:method",
+                        "oblast_name_en",
+                        "gppd_overlap",
+                    ]
+                ],
                 data=[],
-                page_size=15,
+                page_size=10,
                 export_format=None,  # disable default top-left export button
                 style_table={
                     "overflowX": "auto",
@@ -168,13 +208,16 @@ def get_main_content_with_oblast(unique_oblasts):
                 style_header={"fontWeight": "bold"},
             ),
             html.Div(
-                html.Button(
-                    "⬇️ Download CSV",
-                    id="download-button",
-                    n_clicks=0,
-                    className="download-btn minimal-btn",
-                ),
-                style={"marginTop": "10px", "textAlign": "left", "float": "none"},  # ensures it's below table, left-aligned
+                children=[
+                    html.Span("Download CSV", className="download-text"),  # text next to button
+                    html.Button(
+                        html.I(className="fa-solid fa-download"),  # Font Awesome icon
+                        id="download-button",
+                        n_clicks=0,
+                        className="download-btn minimal-btn",
+                    ),
+                ],
+                className="download-wrapper",
             ),
             dcc.Download(id="download-data"),
         ],

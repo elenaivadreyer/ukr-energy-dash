@@ -24,12 +24,6 @@ dependencies = [
     'plotly>=5.0.0',
     'pandas>=2.0.0',
     'numpy>=1.20.0',
-    'openpyxl==3.1.2', # NOTE: necessary for pd.read_excel()
-    'requests==2.31.0',
-    'sqlalchemy==1.4.51',
-    'bs4==0.0.2',
-    'beautifulsoup4==4.12.3',
-    'xlrd==2.0.1', # NOTE: this is necessary for older .xls files, pd.read_excel()
 ]
 
 [project.optional-dependencies]
@@ -131,6 +125,8 @@ select = [
 
 #Ignoring specific rule codes
 ignore = [
+    "E501", #line length handled globally
+    "T201", #print statement allowed for debugging purposes
     "E722", #Do not use bare except (ignored in previous template version)
     "D100", #all mandatory requirements for docstrings in public functions, modules, etc excluded
     "D101", #all mandatory requirements for docstrings in public functions, modules, etc excluded

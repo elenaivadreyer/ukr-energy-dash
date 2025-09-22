@@ -1,11 +1,13 @@
 # ================= app.py =================
+import datetime as dt
 import os
 import uuid
 
 import dash
 import dash_bootstrap_components as dbc
 import geopandas as gpd
-from dash import Input, Output, State, dcc, html
+import pandas as pd
+from dash import Input, Output, State, dcc
 from dotenv import load_dotenv
 from flask import Flask
 
@@ -40,6 +42,28 @@ server.secret_key = os.getenv("FLASK_SECRET_KEY", str(uuid.uuid4()))
 
 # ================= Layout =================
 app.layout = get_main_layout(unique_oblasts)
+
+app.index_string = """
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+"""
 
 
 # ================= Filter Stores =================
@@ -148,15 +172,8 @@ def update_station_details(clickData, relayoutData, selected_oblast):
             station_row = stations_df.loc[int(station_index)]
             return get_station_details(station_row)
 
-    if "map-display.relayoutData" in triggered or "oblast-dropdown.value" in triggered:
-        return html.Div("Select a power station on the map.", className="placeholder-text")
-
-    return html.Div("Select a power station on the map.", className="placeholder-text")
-
 
 # ================= Lasso / Selected Stations Table =================
-import pandas as pd
-from dash import Input, Output, State
 
 
 @app.callback(
@@ -186,7 +203,9 @@ def update_table(selected_oblast, gppd_filter, selectedData):
     if df.empty:
         return []
 
-    return df[["station_name_en", "power", "plant:source", "oblast_name_en"]].to_dict("records")
+    return df[
+        ["name", "station_name_en", "power", "plant:source", "plant:method", "oblast_name_en", "gppd_overlap"]
+    ].to_dict("records")
 
 
 # 2) Download callback
@@ -200,7 +219,9 @@ def download_csv(n_clicks, table_data):
     if not table_data:
         return None
     df = pd.DataFrame(table_data)
-    return dcc.send_data_frame(df.to_csv, "stations.csv", index=False)
+    # save with a timestamp
+    timestamp = dt.datetime.now().strftime("%Y%m%d")
+    return dcc.send_data_frame(df.to_csv, f"ukraine_power_stations_osm_{timestamp}.csv", index=False)
 
 
 # ================= Run Server =================
