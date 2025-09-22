@@ -1,13 +1,20 @@
-# ================= app.py =================
+"""
+Ukraine Energy Dashboard - Main Application Module.
+
+This module contains the main Dash application for visualizing Ukraine's power stations.
+It includes data loading, layout setup, callbacks for interactivity, and server configuration.
+"""
+
 import datetime as dt
 import os
 import uuid
+from typing import Any
 
 import dash
 import dash_bootstrap_components as dbc
 import geopandas as gpd
 import pandas as pd
-from dash import Input, Output, State, dcc
+from dash import Input, Output, State, dcc, html
 from dotenv import load_dotenv
 from flask import Flask
 
@@ -68,12 +75,32 @@ app.index_string = """
 
 # ================= Filter Stores =================
 @app.callback(Output("gppd-filter-store", "data"), Input("gppd-filter", "value"))
-def store_gppd_filter(value):
+def store_gppd_filter(value: list[str]) -> dict[str, bool]:
+    """
+    Store GPPD filter state in dcc.Store component.
+
+    Args:
+        value: List of selected filter values
+
+    Returns:
+        Dictionary with enabled state for GPPD filter
+
+    """
     return {"enabled": "gppd" in value}
 
 
 @app.callback(Output("substation-filter-store", "data"), Input("substation-filter", "value"))
-def store_substation_filter(value):
+def store_substation_filter(value: list[str]) -> dict[str, bool]:
+    """
+    Store substation filter state in dcc.Store component.
+
+    Args:
+        value: List of selected filter values
+
+    Returns:
+        Dictionary with enabled state for substation filter
+
+    """
     return {"enabled": "substations" in value}
 
 
@@ -90,7 +117,29 @@ def store_substation_filter(value):
     State("map-view-store-mainpage", "data"),
     prevent_initial_call=False,
 )
-def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_store, store_data):
+def update_map(
+    selected_oblast: str | None,
+    click_data: dict[str, Any] | None,
+    relayout_data: dict[str, Any] | None,
+    selected_data: dict[str, Any] | None,
+    gppd_store: dict[str, bool],
+    store_data: dict[str, Any] | None
+) -> dict[str, Any]:
+    """
+    Update the map visualization based on user interactions and filters.
+
+    Args:
+        selected_oblast: Currently selected oblast from dropdown
+        click_data: Data from map click events
+        relayout_data: Data from map zoom/pan events
+        selected_data: Data from lasso/box selection
+        gppd_store: GPPD filter state
+        store_data: Stored map view state
+
+    Returns:
+        Dictionary containing the updated map figure
+
+    """
     ctx = dash.callback_context
     triggered = ctx.triggered[0]["prop_id"] if ctx.triggered else ""
     ignore_click = "oblast-dropdown" in triggered  # ignore stale click
@@ -98,7 +147,7 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
     # 🔹 Apply GPPD filter
     filtered_stations = stations_df.copy()
     if gppd_store and gppd_store.get("enabled"):
-        filtered_stations = filtered_stations[filtered_stations["gppd_overlap"] == True]
+        filtered_stations = filtered_stations[filtered_stations["gppd_overlap"]]
 
     # ---------------- Map Logic ----------------
     if "map-display.relayoutData" in triggered:
@@ -107,7 +156,7 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
                 filtered_stations,
                 oblasts_gdf,
                 selected_oblast=selected_oblast,
-                clickData=None,
+                click_data=None,
                 reset=True,
                 outer_ukraine=outer_ukraine,
             )
@@ -119,17 +168,17 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
             filtered_stations,
             oblasts_gdf,
             selected_oblast=selected_oblast,
-            clickData=None,
+            click_data=None,
             reset=False,
             outer_ukraine=outer_ukraine,
         )
 
-    if "map-display.clickData" in triggered and clickData and not ignore_click:
+    if "map-display.clickData" in triggered and click_data and not ignore_click:
         return generate_map_figure(
             filtered_stations,
             oblasts_gdf,
             selected_oblast=selected_oblast,
-            clickData=clickData,
+            click_data=click_data,
             reset=False,
             outer_ukraine=outer_ukraine,
         )
@@ -139,7 +188,7 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
             filtered_stations,
             oblasts_gdf,
             selected_oblast=selected_oblast,
-            clickData=None,
+            click_data=None,
             reset=False,
             outer_ukraine=outer_ukraine,
         )
@@ -149,7 +198,7 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
         filtered_stations,
         oblasts_gdf,
         selected_oblast=selected_oblast,
-        clickData=None,
+        click_data=None,
         reset=False,
         outer_ukraine=outer_ukraine,
     )
@@ -161,12 +210,25 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
     [Input("map-display", "clickData"), Input("map-display", "relayoutData"), Input("oblast-dropdown", "value")],
     prevent_initial_call=False,
 )
-def update_station_details(clickData, relayoutData, selected_oblast):
-    ctx = dash.callback_context
-    triggered = ctx.triggered[0]["prop_id"] if ctx.triggered else ""
+def update_station_details(
+    click_data: dict[str, Any] | None,
+    relayout_data: dict[str, Any] | None,
+    selected_oblast: str | None
+) -> html.Div | str:
+    """
+    Update station details panel based on map clicks and interactions.
 
-    if clickData and "points" in clickData and len(clickData["points"]) > 0:
-        point = clickData["points"][0]
+    Args:
+        click_data: Data from map click events
+        relayout_data: Data from map zoom/pan events
+        selected_oblast: Currently selected oblast
+
+    Returns:
+        HTML Div with station details or message string
+
+    """
+    if click_data and "points" in click_data and len(click_data["points"]) > 0:
+        point = click_data["points"][0]
         station_index = point.get("customdata")
         if station_index is not None and station_index in stations_df.index:
             station_row = stations_df.loc[int(station_index)]
@@ -183,7 +245,23 @@ def update_station_details(clickData, relayoutData, selected_oblast):
     Input("map-display", "selectedData"),
     prevent_initial_call=False,
 )
-def update_table(selected_oblast, gppd_filter, selectedData):
+def update_table(
+    selected_oblast: str | None,
+    gppd_filter: dict[str, bool] | None,
+    selected_data: dict[str, Any] | None
+) -> list[dict[str, Any]]:
+    """
+    Update the stations table based on filters and selections.
+
+    Args:
+        selected_oblast: Currently selected oblast from dropdown
+        gppd_filter: GPPD filter state
+        selected_data: Data from lasso/box selection on map
+
+    Returns:
+        List of station records for the data table
+
+    """
     df = stations_df.copy()
 
     # filter by oblast
@@ -195,8 +273,8 @@ def update_table(selected_oblast, gppd_filter, selectedData):
         df = df[df["gppd_overlap"]]
 
     # filter by lasso selection
-    if selectedData and "points" in selectedData:
-        indices = [pt.get("customdata") for pt in selectedData["points"] if pt.get("customdata") in stations_df.index]
+    if selected_data and "points" in selected_data:
+        indices = [pt.get("customdata") for pt in selected_data["points"] if pt.get("customdata") in stations_df.index]
         if indices:
             df = stations_df.loc[indices]
 
@@ -215,7 +293,18 @@ def update_table(selected_oblast, gppd_filter, selectedData):
     State("stations-table", "data"),
     prevent_initial_call=True,
 )
-def download_csv(n_clicks, table_data):
+def download_csv(n_clicks: int | None, table_data: list[dict[str, Any]] | None) -> dict[str, Any] | None:
+    """
+    Generate CSV download for the current table data.
+
+    Args:
+        n_clicks: Number of times download button was clicked
+        table_data: Current data in the stations table
+
+    Returns:
+        Download data for dcc.Download component or None
+
+    """
     if not table_data:
         return None
     df = pd.DataFrame(table_data)

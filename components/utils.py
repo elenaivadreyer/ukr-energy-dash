@@ -1,3 +1,14 @@
+"""
+Utility functions for Ukraine Energy Dashboard components.
+
+This module provides utility functions for map visualization, data processing,
+and UI component generation for the Ukraine Energy Dashboard.
+"""
+
+from typing import Any
+
+import geopandas as gpd
+import pandas as pd
 import plotly.graph_objects as go
 from dash import dcc, html
 from matplotlib import colors as mcolors
@@ -24,15 +35,32 @@ power_source_colors = {
 }
 
 
-def hex_to_rgba(hex_color, alpha=0.25):
-    """Convert hex color to rgba string."""
+def hex_to_rgba(hex_color: str, alpha: float = 0.25) -> str:
+    """
+    Convert hex color to rgba string.
+
+    Args:
+        hex_color: Hexadecimal color string (e.g., '#FF0000')
+        alpha: Alpha transparency value between 0 and 1
+
+    Returns:
+        RGBA color string in format 'rgba(r,g,b,alpha)'
+
+    """
     rgb = mcolors.to_rgb(hex_color)
     r, g, b = [int(c * 255) for c in rgb]
     return f"rgba({r},{g},{b},{alpha})"
 
 
-def add_station_markers(fig, stations_df):
-    """Add plants and substations to the map as separate traces."""
+def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
+    """
+    Add plants and substations to the map as separate traces.
+
+    Args:
+        fig: Plotly figure object to add markers to
+        stations_df: GeoDataFrame containing station data with geometry and attributes
+
+    """
     # ---------------- Plants ---------------- #
     plants_df = stations_df[stations_df["power"] == "plant"]
     if not plants_df.empty:
@@ -55,7 +83,7 @@ def add_station_markers(fig, stations_df):
                 lat=lats,
                 lon=lons,
                 mode="markers",
-                marker=dict(size=8, color=colors, symbol="circle"),
+                marker={"size": 8, "color": colors, "symbol": "circle"},
                 customdata=indices,
                 hoverinfo="text",
                 hovertext=hovertexts,
@@ -67,7 +95,7 @@ def add_station_markers(fig, stations_df):
     subs_df = stations_df[stations_df["power"] == "substation"]
     if not subs_df.empty:
         lats, lons, hovertexts = [], [], []
-        for idx, row in subs_df.iterrows():
+        for _, row in subs_df.iterrows():
             geom = row.geometry
             # use centroid for polygon or point
             lat, lon = (geom.centroid.y, geom.centroid.x) if not geom.geom_type == "Point" else (geom.y, geom.x)
@@ -80,11 +108,11 @@ def add_station_markers(fig, stations_df):
                 lat=lats,
                 lon=lons,
                 mode="markers",
-                marker=dict(
-                    size=6,
-                    color="#382b2b",  # fill
-                    symbol="circle",  # only symbol that supports color/size
-                ),
+                marker={
+                    "size": 6,
+                    "color": "#382b2b",  # fill
+                    "symbol": "circle",  # only symbol that supports color/size
+                },
                 text=hovertexts,
                 hovertext=hovertexts,
                 hoverinfo="text",
@@ -97,8 +125,18 @@ def add_station_markers(fig, stations_df):
 
 
 # ---------------- Default map ---------------- #
-def default_map_figure(stations_df, outer_ukraine=None):
-    """Default whole-Ukraine view with all stations (single trace)."""
+def default_map_figure(stations_df: gpd.GeoDataFrame, outer_ukraine: gpd.GeoDataFrame | None = None) -> go.Figure:
+    """
+    Default whole-Ukraine view with all stations (single trace).
+
+    Args:
+        stations_df: GeoDataFrame containing station data
+        outer_ukraine: Optional GeoDataFrame containing Ukraine border geometry
+
+    Returns:
+        Plotly figure object with default map view
+
+    """
     fig = go.Figure()
 
     # lightweight Ukraine border (can be combined further if desired)
@@ -115,7 +153,7 @@ def default_map_figure(stations_df, outer_ukraine=None):
                         lat=list(y),
                         lon=list(x),
                         mode="lines",
-                        line=dict(width=1, color="black"),
+                        line={"width": 1, "color": "black"},
                         hoverinfo="none",
                         showlegend=False,
                     )
@@ -126,7 +164,7 @@ def default_map_figure(stations_df, outer_ukraine=None):
 
     # always set a full mapbox layout so centering works reliably
     fig.update_layout(
-        mapbox=dict(style="carto-positron", center={"lat": 48.3794, "lon": 31.1656}, zoom=5),
+        mapbox={"style": "carto-positron", "center": {"lat": 48.3794, "lon": 31.1656}, "zoom": 5},
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
         showlegend=False,
     )
@@ -134,26 +172,45 @@ def default_map_figure(stations_df, outer_ukraine=None):
 
 
 def generate_map_figure(
-    stations_df, oblasts_gdf, selected_oblast=None, clickData=None, reset=False, outer_ukraine=None
-):
+    stations_df: gpd.GeoDataFrame,
+    oblasts_gdf: gpd.GeoDataFrame,
+    selected_oblast: str | None = None,
+    click_data: dict[str, Any] | None = None,
+    reset: bool = False,
+    outer_ukraine: gpd.GeoDataFrame | None = None
+) -> go.Figure:
     """
-    Build Mapbox figure with priority:
-      1) reset=True → full Ukraine
-      2) clickData → zoom to clicked station (even if no oblast)
-      3) selected_oblast → zoom to oblast centroid
-      4) fallback → full Ukraine
+    Build Mapbox figure with priority.
 
-    Lasso/box selection is enabled.
+    1) reset=True → full Ukraine
+    2) click_data → zoom to clicked station (even if no oblast)
+    3) selected_oblast → zoom to oblast centroid
+    4) fallback → full Ukraine.
+
+    Args:
+        stations_df: GeoDataFrame containing station data
+        oblasts_gdf: GeoDataFrame containing oblast boundaries
+        selected_oblast: Name of selected oblast to zoom to
+        click_data: Click event data from map interaction
+        reset: Whether to reset to full Ukraine view
+        outer_ukraine: Optional GeoDataFrame containing Ukraine border geometry
+
+    Returns:
+        Plotly figure object with map visualization
+
+    Note:
+        Lasso/box selection is enabled.
+
     """
     fig = go.Figure()
 
     # 1️⃣ Reset or no selection → full Ukraine
-    if reset or (selected_oblast is None and not clickData):
+    if reset or (selected_oblast is None and not click_data):
         fig = default_map_figure(stations_df, outer_ukraine=outer_ukraine)
 
     # 2️⃣ ClickData present → zoom to clicked station
-    elif clickData and "points" in clickData and len(clickData["points"]) > 0:
-        point = clickData["points"][0]
+    elif click_data and "points" in click_data and len(click_data["points"]) > 0:
+        point = click_data["points"][0]
         station_index = point.get("customdata")
         if station_index is not None and station_index in stations_df.index:
             station_row = stations_df.loc[station_index]
@@ -174,13 +231,13 @@ def generate_map_figure(
 
             # Zoom to clicked station
             fig.update_layout(
-                mapbox=dict(center={"lat": lat, "lon": lon}, zoom=15, style="carto-positron"),
+                mapbox={"center": {"lat": lat, "lon": lon}, "zoom": 15, "style": "carto-positron"},
                 margin={"r": 0, "t": 0, "l": 0, "b": 0},
                 showlegend=False,
             )
 
             # Draw polygon fill if polygonal
-            if isinstance(geom, (Polygon, MultiPolygon)):
+            if isinstance(geom, Polygon | MultiPolygon):
                 polygons = [geom] if isinstance(geom, Polygon) else geom.geoms
                 for poly in polygons:
                     x, y = poly.exterior.xy
@@ -191,7 +248,7 @@ def generate_map_figure(
                             mode="lines",
                             fill="toself",
                             fillcolor=fill_rgba,
-                            line=dict(width=2, color=color),
+                            line={"width": 2, "color": color},
                             hoverinfo="none",
                             showlegend=False,
                         )
@@ -215,7 +272,7 @@ def generate_map_figure(
                             lat=list(y),
                             lon=list(x),
                             mode="lines",
-                            line=dict(width=2, color="black"),
+                            line={"width": 2, "color": "black"},
                             hoverinfo="none",
                             showlegend=False,
                         )
@@ -227,7 +284,7 @@ def generate_map_figure(
             # Center on oblast centroid
             centroid = filtered_oblast.geometry.unary_union.centroid
             fig.update_layout(
-                mapbox=dict(center={"lat": centroid.y, "lon": centroid.x}, zoom=7, style="carto-positron"),
+                mapbox={"center": {"lat": centroid.y, "lon": centroid.x}, "zoom": 7, "style": "carto-positron"},
                 margin={"r": 0, "t": 0, "l": 0, "b": 0},
                 showlegend=False,
                 dragmode="lasso",
@@ -242,9 +299,17 @@ def generate_map_figure(
 
 
 # ---------------- Station details ---------------- #
-def get_station_details(row):
-    """Generate a detailed HTML Div for a power station."""
-    power = row.get("power", "N/A")
+def get_station_details(row: pd.Series) -> html.Div:
+    """
+    Generate a detailed HTML Div for a power station.
+
+    Args:
+        row: Pandas Series containing station data with attributes
+
+    Returns:
+        Dash HTML Div component with formatted station details
+
+    """
     substation = row.get("substation", "N/A")
     station_name = row.get("station_name", "Unknown")
     station_name_en = row.get("station_name_en", "Unknown")

@@ -1,4 +1,13 @@
+"""
+Data processing module for Ukraine Energy Dashboard.
+
+This module provides functions for fetching and processing power station data
+from OpenStreetMap using the Overpass API and matching with the Global Power
+Plant Database (GPPD).
+"""
+
 from pathlib import Path
+from typing import Any
 
 import geopandas as gpd
 import pandas as pd
@@ -10,7 +19,20 @@ DATA_ASSETS_PATH = Path("/workspaces/ukr_energy_dash/assets/data")
 DATA_ASSETS_PATH.mkdir(parents=True, exist_ok=True)
 
 
-def fetch_overpass_data(query: str) -> dict:
+def fetch_overpass_data(query: str) -> dict[str, Any]:
+    """
+    Fetch data from Overpass API using the provided query.
+
+    Args:
+        query: Overpass QL query string
+
+    Returns:
+        JSON response from Overpass API as dictionary
+
+    Raises:
+        requests.HTTPError: If the request fails
+
+    """
     r = requests.post(OVERPASS_URL, data={"data": query}, timeout=180)
     r.raise_for_status()
     return r.json()
@@ -53,6 +75,16 @@ def elements_to_geodataframe(data: dict) -> gpd.GeoDataFrame:
 
 
 def filter_power_stations(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """
+    Filter GeoDataFrame to keep only power stations and transmission substations.
+
+    Args:
+        gdf: GeoDataFrame containing OpenStreetMap power infrastructure data
+
+    Returns:
+        Filtered GeoDataFrame with only relevant power stations and substations
+
+    """
     mask = gdf.get("plant:source").notna() | (gdf.get("substation") == "transmission")
     gdf = gdf[mask].drop_duplicates(subset=["osm_id", "osm_type"])
     # reduce columns
@@ -121,8 +153,16 @@ def assign_oblasts(
 
 def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """
-    Add a boolean column 'gppd_overlap' to ukraine_gdf,
-    True if any GPPD plant lies within 500 m of the station.
+    Add a boolean column 'gppd_overlap' to ukraine_gdf.
+
+    Checks if any GPPD plant lies within 500 m of the station.
+
+    Args:
+        ukraine_gdf: GeoDataFrame containing Ukrainian power stations
+
+    Returns:
+        GeoDataFrame with added 'gppd_overlap' boolean column
+
     """
     url = (
         "https://github.com/wri/global-power-plant-database/raw/master/output_database/global_power_plant_database.csv"
@@ -155,8 +195,14 @@ def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return ukraine_gdf
 
 
-def main():
-    QUERY = """
+def main() -> None:
+    """
+    Main function to process Ukrainian power stations data.
+
+    Downloads power station data from OpenStreetMap, processes it,
+    assigns oblasts, matches with GPPD data, and saves the results.
+    """
+    query = """
     [out:json][timeout:180];
     area["ISO3166-1"="UA"][admin_level=2]->.a;
     (
@@ -171,7 +217,7 @@ def main():
     """
 
     print("Downloading OSM power stations...")
-    data = fetch_overpass_data(QUERY)
+    data = fetch_overpass_data(query)
     gdf = elements_to_geodataframe(data)
     gdf = filter_power_stations(gdf)
 
