@@ -1,21 +1,17 @@
 # ================= app.py =================
 import os
 import uuid
-import geopandas as gpd
+
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html, Input, Output, State
-from flask import Flask
+import geopandas as gpd
+from dash import Input, Output, State, dcc, html
 from dotenv import load_dotenv
-
-from layouts.layout_main import get_main_layout, unique_oblasts, get_header_with_buttons, get_main_content_with_oblast
+from flask import Flask
 
 # ================= Utilities =================
-from components.utils import (
-    get_station_details,
-    default_map_figure,
-    generate_map_figure
-)
+from components.utils import default_map_figure, generate_map_figure, get_station_details
+from layouts.layout_main import get_main_layout, unique_oblasts
 
 # ================= Load Data =================
 stations_df = gpd.read_file("assets/data/power_stations_with_oblasts.geojson").set_geometry("geometry")
@@ -36,29 +32,26 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
-        "https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Libre+Franklin:wght@100..900&display=swap"
+        "https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Libre+Franklin:wght@100..900&display=swap",
     ],
-    server=server
+    server=server,
 )
-server.secret_key = os.getenv('FLASK_SECRET_KEY', str(uuid.uuid4()))
+server.secret_key = os.getenv("FLASK_SECRET_KEY", str(uuid.uuid4()))
 
 # ================= Layout =================
 app.layout = get_main_layout(unique_oblasts)
 
+
 # ================= Filter Stores =================
-@app.callback(
-    Output("gppd-filter-store", "data"),
-    Input("gppd-filter", "value")
-)
+@app.callback(Output("gppd-filter-store", "data"), Input("gppd-filter", "value"))
 def store_gppd_filter(value):
     return {"enabled": "gppd" in value}
 
-@app.callback(
-    Output("substation-filter-store", "data"),
-    Input("substation-filter", "value")
-)
+
+@app.callback(Output("substation-filter-store", "data"), Input("substation-filter", "value"))
 def store_substation_filter(value):
     return {"enabled": "substations" in value}
+
 
 # ================= Map Callback =================
 @app.callback(
@@ -68,14 +61,14 @@ def store_substation_filter(value):
         Input("map-display", "clickData"),
         Input("map-display", "relayoutData"),
         Input("map-display", "selectedData"),
-        Input("gppd-filter-store", "data")
+        Input("gppd-filter-store", "data"),
     ],
     State("map-view-store-mainpage", "data"),
-    prevent_initial_call=False
+    prevent_initial_call=False,
 )
 def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_store, store_data):
     ctx = dash.callback_context
-    triggered = ctx.triggered[0]['prop_id'] if ctx.triggered else ''
+    triggered = ctx.triggered[0]["prop_id"] if ctx.triggered else ""
     ignore_click = "oblast-dropdown" in triggered  # ignore stale click
 
     # 🔹 Apply GPPD filter
@@ -87,60 +80,62 @@ def update_map(selected_oblast, clickData, relayoutData, selectedData, gppd_stor
     if "map-display.relayoutData" in triggered:
         if selected_oblast:
             return generate_map_figure(
-                filtered_stations, oblasts_gdf,
+                filtered_stations,
+                oblasts_gdf,
                 selected_oblast=selected_oblast,
                 clickData=None,
                 reset=True,
-                outer_ukraine=outer_ukraine
+                outer_ukraine=outer_ukraine,
             )
         else:
             return default_map_figure(filtered_stations, outer_ukraine=outer_ukraine)
 
     if "oblast-dropdown" in triggered:
         return generate_map_figure(
-            filtered_stations, oblasts_gdf,
+            filtered_stations,
+            oblasts_gdf,
             selected_oblast=selected_oblast,
             clickData=None,
             reset=False,
-            outer_ukraine=outer_ukraine
+            outer_ukraine=outer_ukraine,
         )
 
     if "map-display.clickData" in triggered and clickData and not ignore_click:
         return generate_map_figure(
-            filtered_stations, oblasts_gdf,
+            filtered_stations,
+            oblasts_gdf,
             selected_oblast=selected_oblast,
             clickData=clickData,
             reset=False,
-            outer_ukraine=outer_ukraine
+            outer_ukraine=outer_ukraine,
         )
 
     if "map-display.selectedData" in triggered:
         return generate_map_figure(
-            filtered_stations, oblasts_gdf,
+            filtered_stations,
+            oblasts_gdf,
             selected_oblast=selected_oblast,
             clickData=None,
             reset=False,
-            outer_ukraine=outer_ukraine
+            outer_ukraine=outer_ukraine,
         )
 
     # Default fallback
     return generate_map_figure(
-        filtered_stations, oblasts_gdf,
+        filtered_stations,
+        oblasts_gdf,
         selected_oblast=selected_oblast,
         clickData=None,
         reset=False,
-        outer_ukraine=outer_ukraine
+        outer_ukraine=outer_ukraine,
     )
+
 
 # ================= Station Sidebar =================
 @app.callback(
     Output("station-details", "children"),
-    [
-        Input("map-display", "clickData"),
-        Input("map-display", "relayoutData"),
-        Input("oblast-dropdown", "value")
-    ],
-    prevent_initial_call=False
+    [Input("map-display", "clickData"), Input("map-display", "relayoutData"), Input("oblast-dropdown", "value")],
+    prevent_initial_call=False,
 )
 def update_station_details(clickData, relayoutData, selected_oblast):
     ctx = dash.callback_context
@@ -158,17 +153,18 @@ def update_station_details(clickData, relayoutData, selected_oblast):
 
     return html.Div("Select a power station on the map.", className="placeholder-text")
 
+
 # ================= Lasso / Selected Stations Table =================
-from dash import dcc, html, Input, Output, State
-from dash import dash_table
 import pandas as pd
+from dash import Input, Output, State
+
 
 @app.callback(
     Output("stations-table", "data"),
     Input("oblast-dropdown", "value"),
     Input("gppd-filter-store", "data"),
     Input("map-display", "selectedData"),
-    prevent_initial_call=False
+    prevent_initial_call=False,
 )
 def update_table(selected_oblast, gppd_filter, selectedData):
     df = stations_df.copy()

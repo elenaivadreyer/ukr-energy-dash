@@ -1,22 +1,20 @@
-import requests
+from pathlib import Path
+
 import geopandas as gpd
 import pandas as pd
-from shapely.geometry import Point, LineString, Polygon, MultiPolygon
-from pathlib import Path
-from typing import Optional
-
+import requests
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 DATA_ASSETS_PATH = Path("/workspaces/ukr_energy_dash/assets/data")
 DATA_ASSETS_PATH.mkdir(parents=True, exist_ok=True)
 
-# -----------------------
-# FUNCTIONS
-# -----------------------
+
 def fetch_overpass_data(query: str) -> dict:
     r = requests.post(OVERPASS_URL, data={"data": query}, timeout=180)
     r.raise_for_status()
     return r.json()
+
 
 def elements_to_geodataframe(data: dict) -> gpd.GeoDataFrame:
     """Convert Overpass JSON → GeoDataFrame (points/lines/polygons)."""
@@ -38,43 +36,53 @@ def elements_to_geodataframe(data: dict) -> gpd.GeoDataFrame:
                 if m["type"] == "way" and m.get("role") in ["outer", ""]:
                     way = way_by_id.get(m["ref"])
                     if way:
-                        coords = [(node_by_id[n]["lon"], node_by_id[n]["lat"]) for n in way.get("nodes", []) if n in node_by_id]
+                        coords = [
+                            (node_by_id[n]["lon"], node_by_id[n]["lat"])
+                            for n in way.get("nodes", [])
+                            if n in node_by_id
+                        ]
                         if coords and coords[0] == coords[-1]:
                             polys.append(Polygon(coords))
             if polys:
                 geom = MultiPolygon(polys) if len(polys) > 1 else polys[0]
 
         if geom:
-            features.append({
-                "osm_id": el["id"],
-                "osm_type": el["type"],
-                **el.get("tags", {}),
-                "geometry": geom
-            })
+            features.append({"osm_id": el["id"], "osm_type": el["type"], **el.get("tags", {}), "geometry": geom})
 
     return gpd.GeoDataFrame(features, crs="EPSG:4326")
 
+
 def filter_power_stations(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    mask = (
-        gdf.get("plant:source").notna() |
-        (gdf.get("substation") == "transmission")
-    )
+    mask = gdf.get("plant:source").notna() | (gdf.get("substation") == "transmission")
     gdf = gdf[mask].drop_duplicates(subset=["osm_id", "osm_type"])
     # reduce columns
-    cols_to_keep = ['osm_id', 'osm_type', 'power', 'substation', 'name', 'name:en', 'operator',
-                    'operator:en', 'barrier', 'voltage', 'landuse', 'plant:method', 'plant:output:electricity',
-                    'plant:source', 'geometry']
+    cols_to_keep = [
+        "osm_id",
+        "osm_type",
+        "power",
+        "substation",
+        "name",
+        "name:en",
+        "operator",
+        "operator:en",
+        "barrier",
+        "voltage",
+        "landuse",
+        "plant:method",
+        "plant:output:electricity",
+        "plant:source",
+        "geometry",
+    ]
     gdf = gdf[[col for col in cols_to_keep if col in gdf.columns]]
     # rename columns
-    gdf = gdf.rename(columns={
-        "name:en": "station_name_en"
-    })
+    gdf = gdf.rename(columns={"name:en": "station_name_en"})
     return gdf
+
 
 def assign_oblasts(
     stations_gdf: gpd.GeoDataFrame,
     gadm_url: str = "https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_UKR.gpkg",
-    swap_dict: Optional[dict] = None
+    swap_dict: dict | None = None,
 ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """
     Assign each power station to a Ukrainian oblast and also return oblast polygons.
@@ -82,6 +90,7 @@ def assign_oblasts(
     Returns:
         stations_with_oblasts: GeoDataFrame of stations with 'oblast_name_en'
         oblasts_gdf: GeoDataFrame of oblast polygons (oblast_name_en + geometry)
+
     """
     gdf_oblasts = gpd.read_file(gadm_url, layer="ADM_ADM_1")
 
@@ -105,12 +114,7 @@ def assign_oblasts(
 
     # Spatial join (stations to oblasts)
     stations = stations_gdf.to_crs(gdf_oblasts.crs)
-    matched = gpd.sjoin(
-        stations,
-        gdf_oblasts,
-        how="left",
-        predicate="within"
-    ).drop(columns=["index_right"])
+    matched = gpd.sjoin(stations, gdf_oblasts, how="left", predicate="within").drop(columns=["index_right"])
 
     return matched, gdf_oblasts
 
@@ -120,12 +124,12 @@ def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     Add a boolean column 'gppd_overlap' to ukraine_gdf,
     True if any GPPD plant lies within 500 m of the station.
     """
-    url = "https://github.com/wri/global-power-plant-database/raw/master/output_database/global_power_plant_database.csv"
+    url = (
+        "https://github.com/wri/global-power-plant-database/raw/master/output_database/global_power_plant_database.csv"
+    )
     df_gppd = pd.read_csv(url, low_memory=False)  # suppress dtype warning
     gdf_gppd = gpd.GeoDataFrame(
-        df_gppd,
-        geometry=gpd.points_from_xy(df_gppd["longitude"], df_gppd["latitude"]),
-        crs="EPSG:4326"
+        df_gppd, geometry=gpd.points_from_xy(df_gppd["longitude"], df_gppd["latitude"]), crs="EPSG:4326"
     )
     gdf_gppd_ua = gdf_gppd[gdf_gppd["country_long"] == "Ukraine"].to_crs(3857)
 
@@ -138,7 +142,7 @@ def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         gdf_buffered.reset_index(),  # keep original index as column
         gdf_gppd_ua[["geometry"]],
         how="left",
-        predicate="intersects"
+        predicate="intersects",
     )
 
     # Collapse → True if at least one match per station
@@ -186,6 +190,7 @@ def main():
 
     print(f"✅ Saved stations → {stations_path}")
     print(f"✅ Saved oblasts → {oblasts_path}")
+
 
 if __name__ == "__main__":
     main()
