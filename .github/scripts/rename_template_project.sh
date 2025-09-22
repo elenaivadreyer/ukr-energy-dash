@@ -16,7 +16,7 @@ echo "Description: $description";
 echo "Renaming project..."
 
 original_author="author_name"
-original_name="data_template_project_name"
+original_name="ukr_energy_dash"
 original_description="project_description"
 # for filename in $(find . -name "*.*")
 for filename in $(git ls-files)
@@ -42,14 +42,14 @@ done
 
 echo "Renaming file names..."
 
-mv src/data_template_project_name src/$name
-echo "Renamed src/data_template_project_name to src/$name"
+mv src/ukr_energy_dash src/$name
+echo "Renamed src/ukr_energy_dash to src/$name"
 
-mv notebooks/sample_data_template_project_name.ipynb notebooks/sample_$name.ipynb
-echo "Renamed notebooks/sample_data_template_project_name.ipynb to notebooks/sample_$name.ipynb"
+mv notebooks/sample_ukr_energy_dash.ipynb notebooks/sample_$name.ipynb
+echo "Renamed notebooks/sample_ukr_energy_dash.ipynb to notebooks/sample_$name.ipynb"
 
-mv tests/test_data_template_project_name.py tests/test_$name.py
-echo "Renamed tests/test_data_template_project_name.py to tests/test_$name.py"
+mv tests/test_ukr_energy_dash.py tests/test_$name.py
+echo "Renamed tests/test_ukr_energy_dash.py to tests/test_$name.py"
 
 # This command runs only once on GHA!
 rm -rf .github/template.yml

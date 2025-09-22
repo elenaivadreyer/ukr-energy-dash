@@ -1,0 +1,1878 @@
+/* -------------------------
+   Global Styles
+   ------------------------- */
+
+body {
+    font-family: 'Libre Franklin', sans-serif;
+}
+
+/* Header section: fixed at the top */
+.header {
+    width: 100%; /* Take full width of the viewport */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px; /* Adjust height as needed */
+    background-color: white; /* Set background color for visibility */
+    z-index: 1000; /* Ensure it stays above other content */
+    border-bottom: 1px solid #ddd; /* Optional: Add border for separation */
+}
+
+/* Body section will grow to fill available space */
+.body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding-top: 90px;
+}
+
+/* -------------------------
+   General Container Styles
+   ------------------------- */
+
+.container-style {
+    padding: 1rem;
+    background-color: white/*#EAECEE*/;
+}
+
+/* -------------------------
+   Title and Year Text Styles
+   ------------------------- */
+
+/* Header container that holds title and buttons */
+.header-container {
+    display: flex;
+    justify-content: space-between; /* Align title to the left, buttons to the right */
+    align-items: center;
+    width: 100%; /* Take full width of the header */
+}
+
+.header-title {
+    /*background-color: lightblue; !* Debug color for the title *!*/
+    flex-grow: 1;
+}
+
+.title-section {
+    /*font-family: "Kaisei Decol", serif;*/
+    font-size: 40px;
+    margin-left: 50px;
+    color: black;
+    /*font-weight: 400;*/
+    font-weight: bold;
+    /*font-size: 12px; /* Adjust as needed */
+    margin-top: 20px;
+
+}
+
+.year-text {
+    color: #C2282D;
+}
+
+/* -------------------------
+   Hamburger Nav Styling
+   ------------------------- */
+
+/* Hamburger styles */
+.hamburger-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    cursor: pointer;
+    margin-right: 50px;
+}
+
+.bar {
+    height: 3px;
+    background-color: #C2282D; /* Michelin Red */
+    border-radius: 2px;
+}
+
+/* Base styles for dropdown */
+.nav-dropdown {
+    position: absolute;
+    right: 50px;
+    top: 80px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* When visible */
+.nav-dropdown.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.nav-link {
+    display: block;
+    padding: 8px 12px;
+    color: black;
+    text-decoration: none;
+    font-weight: 500;
+    opacity: 1;
+    text-align: left;
+    transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+    opacity: 0.8;
+}
+
+.nav-link.active {
+    color: #C2282D;
+}
+
+/* -------------------------
+   City match section styling
+   ------------------------- */
+
+.city-match-content-wrapper-mainpage {
+    /*background-color: #ffefc1;*/
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.city-match-sidebar-mainpage {
+    /*background-color: #c1e7ff;*/
+    width: 35%;
+    float: left;
+}
+
+.city-match-main-content-mainpage {
+    /*background-color: #e1ffc1;*/
+    width: 65%;
+    float: right;
+}
+
+.city-match-output-container-mainpage {
+    display: none;  /* Hidden by default */
+    margin: 0;
+    padding: 0;
+    width: 100%;  /* Ensures it stays aligned with the input field */
+}
+
+.city-match-output-container-mainpage p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Make the container visible only when it has content */
+.city-match-output-container-mainpage.visible {
+    display: block;  /* Show when there's content */
+    margin: 0;
+    padding: 0;
+}
+
+.info-toggle-button {
+    background-color: #f0f0f0;  /* Light grey background */
+    color: #555;  /* Muted text color */
+    border: 1px solid #ccc;  /* Light border */
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Hover text (tooltip) for search button */
+.info-toggle-button:hover:after {
+    content: "Search if a location in France (village, commune, town, or city) has restaurants awarded by Michelin";
+    position: absolute;
+    top: 50%;
+    left: 105%;  /* Move the tooltip to the right of the button */
+    transform: translateY(-50%);  /* Vertically center the tooltip */
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: #333;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 9999;
+    text-align: left;  /* Align text inside the tooltip */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+}
+
+.info-toggle-button:hover {
+    background-color: #ddd;  /* Darken on hover for subtle effect */
+}
+
+/* Add margin around the button */
+.info-tab-container {
+    text-align: left;
+}
+
+.city-input-field {
+    color: #555;  /* Text color */
+    border: 1px solid #ddd;  /* Light border matching the buttons */
+    border-radius: 5px;  /* Rounded corners matching buttons */
+    padding: 5px 10px;  /* Ensure similar padding to buttons */
+    font-size: 14px;  /* Matching the font size */
+    height: 30px;  /* Ensure consistent height with buttons */
+    box-sizing: border-box;  /* Ensure the padding and border are included in the input size */
+}
+
+/* Adjust spacing inside the search section */
+.city-input-container-mainpage {
+}
+
+.submit-city-button-mainpage,
+.clear-city-button-mainpage {
+    background-color: #f0f0f0;  /* Light grey background */
+    color: #555;  /* Muted text color */
+    border: 1px solid #ccc;  /* Light border */
+    border-radius: 5px;
+    padding: 3px 10px;
+    font-size: 14px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.submit-city-button-mainpage:hover,
+.clear-city-button-mainpage:hover {
+    background-color: #ddd;  /* Darken on hover */
+}
+
+/* -------------------------
+   Footer Container Styles
+   ------------------------- */
+
+/* Main footer div with debug color */
+.footer-main {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    width: 100%;
+    z-index: 1000;
+    /*background-color: lightcoral; !* Debug color for visibility *!*/
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #ddd; /* Optional: Add border for separation */
+}
+
+/* Info container with its own debug color */
+.info-container {
+    /*background-color: lightblue; !* Debug color for the content container *!*/
+    width: 100%;
+    padding: 0 50px; /* Add space on the sides */
+    display: flex; /* Flexbox for horizontal alignment */
+    align-items: center; /* Vertically center the children */
+    justify-content: flex-start; /* Align content to the left */
+}
+
+/* Styling for GitHub image */
+.info-image {
+    margin-right: 0.5rem; /* Space between image and text */
+    width: 32px;
+}
+
+/* Wrapper for all text */
+.text-container {
+    display: flex;
+    flex-direction: column; /* Stack the two lines vertically */
+    line-height: 1.1; /* Adjust line spacing (smaller value reduces the gap) */
+}
+
+/* First line with GitHub link */
+.info-line {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 0;
+}
+
+/* Link styling */
+.info-link {
+    text-decoration: none; /* Removes underline */
+    color: #007bff;
+    font-size: 12px;
+}
+
+.info-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Info text styling */
+.info-text {
+    font-size: 12px;
+    color: black;
+}
+
+.info-footer, .disclaimer-text, .disclaimer-link {
+    margin: 0; /* Ensures no unwanted spacing */
+    padding: 0;
+}
+
+/* Footer text styling */
+.info-footer {
+    font-size: 9px;
+    color: #555; /* Grey color for footer text */
+    opacity: 0.7; /* Slight transparency */
+}
+
+/* Disclaimer text styling */
+.disclaimer-text {
+    font-size: 10px;
+    color: #555; /* Subtle grey color */
+}
+
+/* Styling for disclaimer link */
+.disclaimer-link {
+    font-size: 10px; /* Match disclaimer font size */
+    color: #007bff; /* Subtle blue for links */
+}
+
+/* -------------------------
+   404 Styles
+   ------------------------- */
+
+.not-found-content-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full height of the viewport */
+    text-align: center; /* Center text inside the container */
+}
+
+.custom-text {
+    font-size: 24px; /* Adjust font size as needed */
+}
+
+/* -------------------------
+   Dropdown Styles
+   ------------------------- */
+.dropdown-style {
+    margin-bottom: 5px;
+}
+
+/* -------------------------
+   Main Content Container for Map and Sidebar
+   ------------------------- */
+
+/* Main layout */
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Main content: column flow */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+/* Map + Sidebar stay fixed height */
+.map-sidebar-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: stretch;
+    height: 75vh;              /* fixed height for top section */
+    margin-bottom: 20px;
+}
+
+/* Map section (left) */
+.map-section {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Map display fills map section */
+.map-display {
+    flex-grow: 1;
+    height: 100%;
+}
+
+/* Sidebar (right) */
+.sidebar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Cursor override for clickability */
+#map-display .scatterlayer path {
+    cursor: pointer !important;
+}
+
+/* Table section */
+.stations-table-section {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Minimal download button under table */
+.table-download-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 5px;
+}
+
+.download-btn.minimal-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.download-btn.minimal-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* Move the built-in export button below the table */
+.stations-table-section .export {
+    display: block;          /* makes it a block element so it appears below */
+    margin-top: 10px;        /* spacing from table */
+    float: right;            /* align right */
+    font-family: 'Sans-serif';
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Optional hover effect */
+.stations-table-section .export:hover {
+    background-color: #e0e0e0;
+}
+
+.dash-spreadsheet-menu {
+margin: 1% 0 1% 0;
+justify-content: left;
+}
+
+.export {
+border-radius: 5px;
+border: 2px solid lightgrey;
+padding: 0 15px;
+font-family: ‘Poppins-Bold’;
+background-color:white;
+transition:.75s;
+}
+
+.stations-table-section .download-btn {
+    margin-top: 10px;       /* space below table */
+    float: right;           /* align right */
+    border-radius: 5px;
+    border: 2px solid lightgrey;
+    padding: 5px 15px;
+    font-family: 'Poppins-Bold';
+    background-color: white;
+    transition: 0.75s;
+}
+
+.stations-table-section .download-btn:hover {
+    color: white;
+    box-shadow: 0px 1px 3px lightgrey;
+    background-color: lightgrey;
+}
+
+
+
+.star-ratings-container-main {
+    display: flex;
+    width: 70%;
+    margin-top: 10px;
+    margin-bottom: 60px;
+    justify-content: space-between; /* Ensures equal spacing */
+}
+
+.star-ratings-container-main > div {
+    flex: 1;               /* Makes all 5 items equal width */
+    text-align: left;      /* Aligns content to the left inside each block */
+    padding-right: 10px;   /* Optional: small gap between columns */
+}
+
+.michelin-star,
+.bib-image,
+.green-star {
+    height: 20px;
+    width: auto;
+    vertical-align: middle;
+}
+
+.star-description-title {
+    font-weight: bold;
+    font-size: 12px; /* Adjust as needed */
+    margin-top: 2px;
+    margin-bottom: 0; /* Remove bottom margin */
+}
+
+.star-description-text {
+    font-size: 10px; /* Smaller text for description */
+    color: #555; /* Darker grey for the description text */
+    margin-top: 0; /* Space after the title */
+    margin-bottom: 10px; /* Remove bottom margin */
+}
+
+.sidebar-container > * {
+    padding: 0;
+    margin: 0; /* Remove margins to make sure content does not "spill" out */
+}
+
+.description-container,
+.instructions-container,
+.dropdown-container,
+.ratings-container,
+.restaurant-details-container{
+    padding: 0; /* Remove padding */
+    background-color: white;/*#f8f9fa*/;
+}
+
+/* -------------------------
+   Description and Instructions Styles
+   ------------------------- */
+
+.description-container {
+    margin-bottom: 10px;
+}
+
+.site-description {
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.instructions-container {
+    margin-bottom: 10px;
+}
+
+.instructions {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.dropdown-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.dropdown-style {
+    margin-bottom: 15px; /* Add some space between dropdowns */
+}
+
+.dropdown-container {
+    margin-bottom: 0;
+}
+
+.hidden-paris-section {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease-in-out;
+}
+
+.visible-paris-section {
+    height: auto; /* Allows the content to define the height */
+    overflow: visible;
+    transition: height 0.3s ease-in-out;
+}
+
+/* -------------------------
+   Star selection Styles
+   ------------------------- */
+
+.star-select-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.star-button {
+    /*width: 40px;*/
+    padding: 5px;
+}
+
+.single-button {
+    margin-right: 5px;
+}
+
+.star-filter-section > div {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;  /* Adjust this value to manage the gap between buttons */
+    margin-bottom: 10px;
+}
+
+.star-filter-buttons > * {
+    flex: 1;
+    text-align: center;
+}
+
+/* Hover effect for star buttons */
+.star-button:hover {
+    opacity: 0.8 !important;
+    cursor: pointer;
+}
+
+/* Active state for star buttons */
+.star-button.active {
+    opacity: 1;
+    box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Inactive state, specifically less opacity when not active */
+.star-button.inactive {
+    opacity: 0.5; /* Lower opacity for inactive */
+}
+
+.star-button,
+.selected-toggle-button {
+    height: 36px;
+    line-height: 1;
+    text-align: center;
+    border-radius: 8px;
+    font-family: inherit;
+    flex: 1;
+}
+
+.selected-toggle-wrapper {
+    display: flex;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.selected-toggle-inner {
+    flex: 1; /* Same width as a star button */
+    display: flex;
+    justify-content: flex-start;  /* Align the button to the left */
+    margin-right: 5px;
+}
+
+.selected-toggle-spacer {
+    flex: 1;  /* Spacer takes up 75% of the row */
+    margin-right: 5px;
+}
+
+.selected-toggle-button {
+    background-color: #808080; /* Matches the grey marker */
+    color: #FFFFFF;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid black;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.selected-toggle-button:hover {
+    opacity: 0.8 !important;
+    cursor: pointer;
+}
+
+.selected-toggle-button.active {
+    opacity: 1;
+    box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Inactive state, specifically less opacity when not active */
+.selected-toggle-button.inactive {
+    opacity: 0.5; /* Lower opacity for inactive */
+}
+
+/* -------------------------
+   Restaurant Details Styles
+   ------------------------- */
+
+.restaurant-details {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #ccc;  /* Default border color */
+}
+
+.placeholder-text {
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #666666;  /* Default border color */
+    background-color: #f8f8f8;  /* Very light grey background */
+    text-align: center;
+}
+
+.restaurant-details-container {
+    margin-top: 20px;
+}
+
+/* Header section containing the name and stars */
+.details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.restaurant-name {
+    font-size: 18px; /* Larger text for the name */
+    font-weight: 700; /* Make the name stand out */
+    margin-right: 10px; /* Space between name and stars */
+}
+
+.restaurant-stars {
+    display: flex; /* Align star images in a row */
+    flex-wrap: nowrap; /* Prevent stars from wrapping to the next line */
+}
+
+/* Styling for the cuisine and price */
+.details-cuisine,
+.details-price {
+    font-size: 12px; /* Slightly larger text for key details */
+}
+
+.restaurant-info {
+    margin-bottom: 10px;
+}
+
+/* Address and location styling */
+.address-info {
+    font-size: 12px; /* Clear and legible font size */
+    margin-bottom: 10px; /* Space above address and location */
+}
+
+/* Link styling for the website */
+.restaurant-website {
+    font-size: 12px;
+    display: block; /* Ensures the link is on a new line */
+    color: #0056b3; /* Traditional link color */
+    text-decoration: none; /* Removes underline */
+    font-weight: 500; /* Bold for emphasis */
+}
+
+.restaurant-website:hover {
+    text-decoration: underline; /* Underline on hover for clarity */
+}
+
+.container-style {
+    padding: 0; /* If you want to remove padding globally */
+}
+
+
+/* -------------------------
+   -------------------------
+   Analysis Page
+   -------------------------
+   ------------------------- */
+
+/* Body: Dynamic height based on remaining space */
+.content-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: calc(100vh - 60px); /* Subtracting footer height */
+    padding-left: 50px;
+}
+
+.analysis-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Allow scrolling if content exceeds view */
+    margin-top: 80px; /* Adjust for header */
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.placeholder-text-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 20px;
+}
+
+.michelin-text-container {
+    /*background-color: #f5f5f5;*/
+    border-bottom: 1px solid black;
+    padding-top: 20px;
+    padding-bottom: 0;
+    width: calc(100% - 50px);
+}
+
+.michelin-title-paragraph {
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.michelin-text-paragraph {
+    font-size: 16px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+}
+
+.three-child, .two-child, .one-child, .bib-child, .green-child {
+    width: 20%;
+    box-sizing: border-box; /* Ensure padding is included in the width calculation */
+}
+
+.star-ratings-container {
+    display: flex;
+    width: 100%;
+    padding-left: 5%;
+    margin-bottom: 20px;
+}
+
+/* -------------------------
+   Region Section Styling
+   ------------------------- */
+
+/* Wrapper to couple sidebar and content for regions */
+.region-content-wrapper {
+    /*background-color: #d9edf7; !* Pastel blue *!*/
+    display: flex;
+    flex-direction: column;  /* Change to column layout to stack the description, controls, and graph */
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 40px; /* Space between region and department sections */
+    padding-right: 50px;
+}
+
+.distribution-header {
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 30px;
+}
+
+.distribution-section-header {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Region description taking full width */
+.region-description {
+    /*background-color: #f7cac9; !* Soft pastel coral *!*/
+    width: 100%;  /* Take full width */
+    font-size: 18px;
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+
+/* Controls (Dropdown and Star Filter) */
+.region-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;  /* Take full width */
+    gap: 40px;
+}
+
+.region-filter-title {
+    font-size: 16px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.region-filter-container {
+    /*background-color: #fdf5e6; !* Pastel yellow *!*/
+    width: 50%;  /* Take 50% width for the dropdown */
+    float: left;
+    box-sizing: border-box;
+}
+
+.star-filter-container-region {
+    /*background-color: #c8e6c9; !* Soft pastel green *!*/
+    width: 50%;  /* Take 50% width for the star filter */
+    box-sizing: border-box;
+}
+
+/* Dropdown styling */
+.dropdown-region-analysis {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Visuals (graph and map) are in a row */
+.region-visuals {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100%; /* Stretch to fill the height */
+}
+
+.region-graph, .region-map {
+    width: 50%;
+    height: 100%;
+    display: inline-block;
+    overflow: hidden; /* Prevents overflow */
+}
+
+/* -------------------------
+   Region dropdowns
+   ------------------------- */
+
+/* Change the background and text color of selected dropdown values */
+.dropdown-region-analysis .Select-value {
+    background-color: rgba(194, 40, 45, 0.2) !important; /* Semi-transparent red background */
+    color: #C2282D !important;  /* Bold red text */
+    border-radius: 5px;
+    border: none !important; /* Remove blue border */
+}
+
+/* Target the label inside each selected value to ensure bold red text */
+.dropdown-region-analysis .Select-value-label {
+    font-size: 14px;
+    color: #C2282D !important; /* Bold red text */
+    box-shadow: none !important; /* Remove blue shadow */
+}
+
+/* Dropdown styling for regions */
+.dropdown-region-analysis .Select-control {
+    font-size: 14px; /* Adjust font size of labels */
+}
+
+/* Customize the "x" button on hover */
+.dropdown-region-analysis .Select-value-icon:hover {
+    color: #C2282D !important; /* Red color for the "x" icon on hover */
+}
+
+/* Ensure the "x" stays black when not hovered */
+.dropdown-region-analysis .Select-value-icon {
+    color: black !important; /* Black color for the "x" by default */
+}
+
+/* Remove blue outline when the "x" button or value is focused */
+.dropdown-region-analysis .Select-value:focus,
+.dropdown-region-analysis .Select-value-icon:focus {
+    outline: none !important; /* Remove focus outline */
+}
+
+/* -------------------------
+   Department Section Styling
+   ------------------------- */
+
+/* Wrapper to couple sidebar and content for departments */
+.department-content-wrapper {
+    /*background-color: #d9f7be; !* Soft pastel green *!*/
+    /*border-top: 1px solid black;*/
+    display: flex;
+    flex-direction: column;  /* Change to column layout to stack the description, controls, and graph */
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 40px; /* Space between department and other sections */
+    padding-right: 50px;
+}
+
+/* Department description taking full width */
+.department-description {
+    /*background-color: #ffe4e1; !* Light pastel coral *!*/
+    width: 100%;  /* Take full width */
+    font-size: 18px;
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+
+/* Controls (Dropdown and Star Filter) */
+.department-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;  /* Take full width */
+    gap: 40px;
+}
+
+.region-filter-title {
+    font-size: 16px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.department-filter-container {
+    /*background-color: #fdf5e6; !* Pastel yellow *!*/
+    flex: 1;  /* Each child takes up equal space (50% each) */
+    box-sizing: border-box;
+    max-width: calc(50% - 20px);
+}
+
+.star-filter-container-department {
+    /*background-color: #c8e6c9; !* Soft pastel green *!*/
+    flex: 1;  /* Each child takes up equal space (50% each) */
+    display: flex;
+    justify-content: flex-end;  /* Align star filter to the right */
+    box-sizing: border-box;
+}
+
+/* Dropdown styling */
+.dropdown-department-analysis {
+    margin-bottom: 20px;
+    width: 60%;
+}
+
+.star-filter-section-department {
+    width: 100%; /* Star filter takes full width of its parent */
+}
+
+/* Visuals (graph and map) are in a row */
+.department-visuals {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100%; /* Stretch to fill the height */
+}
+
+.department-graph, .department-map {
+    height: 100%; /* Match the height of visuals container */
+    width: 50%;
+    display: inline-block;
+    overflow: hidden;
+}
+
+/* -------------------------
+   Arrondissement Section Styling
+   ------------------------- */
+
+/* Wrapper to couple sidebar and content for arrondissements */
+
+.hidden-section {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease-in-out;
+}
+
+/* Visible Section - Dynamic Height */
+.visible-section {
+    /*background-color: #d9edf7; !* Pastel blue *!*/
+    /*border-top: 1px solid black;*/
+    display: flex;
+    flex-direction: column;  /* Ensure elements are stacked vertically */
+    transition: height 0.3s ease-in-out;
+    height: auto; /* Dynamic height based on content */
+    padding-bottom: 40px; /* Space between arrondissement and other sections */
+    padding-right: 50px;
+}
+
+/* Wrapper for arrondissement content */
+.arrondissement-content-wrapper {
+    display: flex;
+    flex-direction: column;  /* Stacks the description, controls, and main content */
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 50px;
+}
+
+/* Arrondissement description taking full width */
+.arrondissement-description {
+    /*background-color: #ffebee; !* Light pastel coral *!*/
+    width: 100%;  /* Take full width */
+    font-size: 18px;
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+
+/* Controls (Dropdown and Star Filter) */
+.arrondissement-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;  /* Full width */
+    gap: 40px;  /* Space between the dropdown and star filter */
+}
+
+/* Dropdown and filter container styles */
+.arrondissement-filter-container {
+    /*background-color: #fdf5e6; !* Pastel yellow *!*/
+    flex: 1;  /* Each child (dropdown and star filter) takes up equal space */
+    box-sizing: border-box;
+    max-width: calc(50% - 20px);  /* 50% minus half of the gap */
+}
+
+.star-filter-container-arrondissement {
+    /*background-color: #c8e6c9; !* Soft pastel green *!*/
+    flex: 1;  /* Equal space as dropdown */
+    display: flex;
+    justify-content: flex-end;  /* Align star filter to the right */
+    box-sizing: border-box;
+}
+
+/* Dropdown styling */
+.dropdown-arrondissement-analysis {
+    margin-bottom: 20px;
+    width: 60%;  /* The dropdown itself takes 60% of its parent (which is 50% of the total width) */
+}
+
+.star-filter-section-arrondissement {
+    width: 100%; /* Star filter takes full width of its parent */
+}
+
+/* Visuals (graph and map) are in a row */
+.arrondissement-visuals {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100%; /* Stretch to fill the height */
+}
+
+.arrondissement-graph, .arrondissement-map {
+    height: 100%;
+    width: 50%;  /* Each takes 50% width */
+    display: inline-block;
+    overflow: hidden;
+}
+
+
+/* -------------------------
+   Analysis Page Star Button Styles
+   ------------------------- */
+
+.star-button-analysis, .star-button-department, .star-button-arrondissement,
+.star-button-cuisine, .star-button-demographics, .star-button-wine {
+    width: 40px;
+    padding: 5px;
+}
+
+.star-filter-buttons-analysis, .star-filter-buttons-department, .star-filter-buttons-arrondissement,
+.star-filter-buttons-cuisine, .star-filter-buttons-demographics, .star-filter-buttons-wine {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.star-button-analysis:hover, .star-button-department:hover, .star-button-arrondissement:hover,
+.star-button-cuisine:hover, .star-button-demographics:hover, .star-button-wine:hover  {
+    opacity: 0.8 !important;
+    cursor: pointer;
+}
+
+.star-filter-section-analysis .star-button-analysis.active,
+.star-filter-section-department .star-button-department.active,
+.star-filter-section-arrondissement .star-button-arrondissement.active,
+.star-filter-section-cuisine .star-button-cuisine.active,
+.star-filter-section-demographics .star-button-demographics.active,
+.star-filter-section-wine .star-button-wine.active {
+    opacity: 1;
+    box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.2);
+}
+
+.star-filter-section-analysis .star-button-analysis.inactive,
+.star-filter-section-department .star-button-department.inactive,
+.star-filter-section-arrondissement .star-button-arrondissement.inactive,
+.star-filter-section-cuisine .star-button-cuisine.inactive,
+.star-filter-section-demographics .star-button-demographics.inactive,
+.star-filter-section-wine .star-button-wine.inactive{
+    opacity: 0.5;
+}
+
+/* -------------------------
+   Top Ranking Section Styling
+   ------------------------- */
+
+/* Wrapper for the entire top ranking section */
+.ranking-content-wrapper {
+    /*background-color: #d9f7be; !* Soft pastel green *!*/
+    border-top: 1px solid black;
+    display: flex;
+    flex-direction: column;  /* Stack description, controls, and content */
+    width: calc(100% - 50px);
+    box-sizing: border-box;
+    padding-right: 50px;
+}
+
+/* Apply margin to all stars */
+.star-group .michelin-star-header {
+    margin-right: 3px;
+    width: 25px;
+    height: auto;
+    vertical-align: middle;
+}
+
+/* Remove margin from the last star in each group */
+.star-group .michelin-star-header:last-of-type {
+    margin-right: 0;
+}
+
+.ranking-header {
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 40px;
+}
+
+/* Description section */
+.ranking-description {
+    /*background-color: #ffebee;  !* Light pastel coral *!*/
+    font-size: 18px;
+    line-height: 1.2;
+    margin-bottom: 30px;
+    padding-top: 30px;
+    width: 100%;  /* Take full width */
+}
+
+/* Controls (Dropdown and Star Filter) */
+.ranking-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Container for dropdowns (taking 75% width) */
+.dropdowns-container {
+    flex-grow: 3;  /* Take 75% of the width */
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;  /* Space between the dropdowns */
+}
+
+/* Granularity dropdown container */
+.granularity-filter-container, .top-ranking-filter-container, .rating-filter-container {
+    /*background-color: #fdf5e6;  !* Pastel yellow *!*/
+    flex: 1;
+    box-sizing: border-box;
+}
+
+/* Dropdown styling for the filters */
+.dropdown-granularity, .dropdown-ranking, .dropdown-star-ranking {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Button container for showing restaurant details (taking 25% width) */
+.toggle-details-container {
+    flex-grow: 1; /* Take 75% of the width */
+    display: flex;
+    justify-content: flex-start; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding-left: 20px;
+}
+
+/* Main content section for top rankings */
+.ranking-main-content {
+    /*background-color: #fdf5e6;  !* Light pastel yellow for content area *!*/
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+/* Button for 'Show Restaurant Details' */
+.button-show-details {
+    padding: 10px 20px;
+    background-color: #C2282D;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+
+/* Button hover and active states */
+.button-show-details:hover,
+.button-show-details:focus {
+    background-color: #A01F25;
+    color: white;
+}
+
+/* -------------------------
+   Demographics Section Styling
+   ------------------------- */
+
+/* Wrapper to couple the main content and filter for demographics */
+.demographics-container {
+    /*background-color: #e2f0f9; !* Light pastel blue *!*/
+    width: 100%;
+    gap: 40px;
+    padding-right: 50px;
+}
+
+.demographics-text-container {
+    /*background-color: #f5f5f5; !* Light grey for neutrality *!*/
+    border-top: 1px solid black;
+    padding-bottom: 30px;
+    width: 100%;
+}
+
+.demographics-header {
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.demographics-text-paragraph {
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.demographics-filter-container {
+    /*background-color: #d9edf7;*/
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 40px;
+}
+
+/* Dropdown containers for demographics section */
+.demographics-dropdown-container {
+    /*background-color: #fdf5e6; !* Light grey background *!*/
+    width: 25%;
+}
+
+.filter-container {
+    /*background-color: #fdf5e6; !* Light grey background *!*/
+    width: 50%;
+}
+
+#demographics-add-remove {
+    min-height: 60px; /* Set a reasonable minimum height */
+    max-height: 150px; /* Allow the height to adjust up to 150px depending on the content */
+}
+
+.demographics-restaurants-controls {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 !important;
+}
+
+.toggle-details-container-demographics {
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+/* Demographics content wrapper */
+.demographics-content-wrapper {
+    /*background-color: #d9edf7; !* Light pastel blue for the wrapper *!*/
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 750px; /* Fixed height for map + bar chart section */
+}
+
+/* Demographics map styling */
+.demographics-map {
+    /*background-color: #cce5ff; !* Light pastel blue *!*/
+    height: auto;
+    width: 50%;
+    display: inline-block;
+}
+
+.demographics-chart-mean {
+    height: auto;
+    width: 50%;
+    display: inline-block;
+}
+
+/* Demographics bar chart styling */
+.demographics-bar-chart {
+    /*background-color: #fdf5e6; !* Light pastel yellow *!*/
+    height: auto;
+    width: 100%;
+    display: inline-block;
+    margin: 0;  /* Ensure no margin */
+    padding: 0; /* Ensure no padding */
+}
+
+.weighted-mean-explanation {
+    text-align: center;
+    padding: 10px;
+    /*border: 1px solid #007bff;*/
+    height: auto;  /* Remove the fixed height to allow dynamic adjustment */
+    margin-top: 0;  /* Ensure no extra margin */
+    margin-bottom: 0;
+}
+
+.weighted-mean-explanation .dash-markdown {
+    margin: 0;  /* Remove any margin from the Markdown element */
+    padding: 0;  /* Remove any padding from the Markdown element */
+}
+
+/* Custom styles for socio-economic metric dropdown with blue color scheme */
+.dropdown-category-demographics .Select-value {
+    background-color: rgba(0, 123, 255, 0.2) !important; /* Light blue background */
+    color: #007bff !important; /* Blue text */
+    border-radius: 5px;
+    border: none !important; /* Remove border */
+}
+
+.dropdown-category-demographics .Select-control {
+    font-size: 14px; /* Adjust font size */
+}
+
+.dropdown-category-demographics .Select-value-label {
+    font-size: 14px;
+    color: #007bff !important; /* Blue text */
+    box-shadow: none !important; /* Remove blue shadow */
+}
+
+.dropdown-category-demographics .Select-value-icon:hover {
+    color: #007bff !important; /* Blue color for the "x" icon on hover */
+}
+
+.dropdown-category-demographics .Select-value-icon {
+    color: black !important; /* Black "x" by default */
+}
+
+.dropdown-category-demographics .Select-value:focus,
+.dropdown-category-demographics .Select-value-icon:focus {
+    outline: none !important; /* Remove focus outline */
+}
+
+/* Hover styling for dropdown */
+.dropdown-category-demographics .Select-option:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Light blue hover effect */
+    color: #0056b3 !important; /* Darker blue on hover */
+}
+
+/* Selected option styling */
+.dropdown-category-demographics .Select-option.is-selected {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+    color: #0056b3 !important; /* Darker blue for selected options */
+}
+
+/* -------------------------
+   Wine Section Styling
+   ------------------------- */
+
+.wine-container {
+    padding-right: 50px;
+}
+
+
+.wine-text-container {
+    /*background-color: #f5f5f5;*/
+    border-top: 1px solid black;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.wine-header {
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.wine-text-paragraph {
+    font-size: 18px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.wine-tagline-paragraph {
+    font-size: 16px;
+    font-style: italic;
+    text-align: center;
+    line-height: 1.2;
+}
+
+
+.wine-restaurants-wrapper {
+    /*background-color: #fdf5e6; !* Light grey background *!*/
+}
+
+.wine-restaurants-controls {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 !important;
+    margin-bottom: 20px;
+}
+
+.wine-map-outlines {
+    /*background-color: #d9edf7; !* Light pastel blue for the wrapper *!*/
+    margin-bottom: 20px;
+}
+
+/* Wine content wrapper */
+.wine-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 40px;
+    /*background-color: #d9edf7; !* Light pastel blue for the wrapper *!*/
+}
+
+/* Wine LLM Output Wrapper */
+.wine-llm-output {
+    padding-left: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  /* Ensure content starts from the top */
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.wine-title {
+    font-size: 18px;
+}
+
+.region-name-placeholder {
+    font-size: 18px;
+}
+
+.LLM-output {
+    flex-grow: 1;
+    margin-top: 10px;
+    font-size: 14px;
+    overflow-y: auto;
+}
+
+/* Disclaimer container layout */
+#disclaimer-container {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    border-top: 1px solid #ccc;
+    background-color: #f7f7f7;
+    width: 100%;
+    text-align: left;
+    bottom: 0;
+    box-sizing: border-box;
+}
+
+/* Align the image and text side by side */
+.disclaimer-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 100%; /* Prevent overflow of the parent */
+    overflow: hidden; /* Hide any potential overflow */
+}
+
+/* Styling for OpenAI logo */
+.openai-logo {
+    width: 80px;  /* Adjust size of the logo */
+    margin-right: 10px;  /* Add space between the logo and text */
+}
+
+/* Styling for disclaimer text */
+.disclaimer-text-wrapper {
+    text-align: left;  /* Align text to the left */
+    flex-grow: 1;  /* Allow the text to take remaining space */
+}
+
+.disclaimer-text-ai {
+    font-size: 10px;
+    color: #666;  /* Grey text color for the disclaimer */
+    margin-top: 20px !important;
+}
+
+
+/* -------------------------
+   Responsive Styles
+   ------------------------- */
+
+@media screen and (max-width: 1400px) {
+    /* Adjust title font size in the header */
+    .header {
+        height: 70px;
+    }
+
+    .title-section {
+        font-size: 50px;
+    }
+
+    .nav-dropdown {
+        top: 70px;           /* Same header height in this breakpoint */
+    }
+
+    .body {
+        padding-top: 80px;
+    }
+
+    .analysis-container {
+        margin-top: 60px; /* Adjust for header */
+    }
+
+    .description-container {
+        margin-bottom: 10px;
+    }
+
+    /* Adjust site description font size */
+    .site-description {
+        font-size: 20px;
+    }
+
+    .restaurant-name {
+        font-size: 16px;
+    }
+}
+
+
+/* Media Query for screens smaller than 1250px (Tablet Layout) */
+@media screen and (max-width: 1250px) {
+    /* Global layout changes */
+    .main-content {
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+
+    .header {
+        margin-right: 30px;
+    }
+
+    .title-section {
+        margin-left: 30px;
+    }
+
+    /* Hamburger styles */
+    .hamburger-menu {
+        margin-right: 30px;
+    }
+
+    .nav-dropdown {
+        right: 0;
+        margin-right: 30px;  /* Aligns with hamburger's new position */
+        top: 70px;           /* Same header height in this breakpoint */
+    }
+
+    .info-container {
+        /*background-color: lightblue; !* Debug color for the content container *!*/
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    /* Main layout changes */
+    .main-layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;  /* Ensure the full height of the viewport is used */
+    }
+
+    .main-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 140px);  /* Adjusting height for header and footer */
+        /*overflow: auto;  !* Enable scrolling if necessary *!*/
+    }
+
+    /* Sidebar now comes above the map */
+    .map-sidebar-container {
+        display: flex;
+        flex-direction: column;  /* Stack sidebar above the map */
+    }
+
+    /* Move the sidebar content above the map */
+    .sidebar-container {
+        /*background-color: lightgreen; !* Debug color *!*/
+        width: 100%;  /* Take full width */
+        order: 1;  /* Move sidebar to appear first */
+        height: auto;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+    /* Map section moves below the sidebar */
+    .map-section {
+        /*background-color: lightblue;*/
+        flex-grow: 1;
+        width: 100%;  /* Map takes full width on tablet layout */
+        padding-right: 0;  /* Remove padding */
+        order: 2;  /* Move map below the sidebar */
+        z-index: 0;
+        position: relative;
+    }
+
+    /* Ensure map display takes full width and height */
+    .map-display {
+        flex-grow: 1;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Full-width description and instructions at the top of main content */
+    .description-container {
+        /*background-color: cadetblue;  !* Optional background color *!*/
+        width: 100%;  /* Take full width */
+        padding: 0;
+        margin-bottom: 5px;
+    }
+
+    .instructions-container {
+        /*background-color: cadetblue;  !* Optional background color *!*/
+        margin-bottom: 10px;
+    }
+
+    .site-description, .instructions {
+        padding: 0;
+        margin: 0;  /* Ensure no bottom margin on the description text */
+    }
+
+    /* Adjust the city match section to take full width below the description and instructions */
+    .city-match-content-wrapper-mainpage {
+        display: none;
+    }
+
+    .city-match-sidebar-mainpage {
+        width: 40%;  /* Take full width on tablet */
+        float: left;  /* Disable float */
+    }
+
+    .city-match-main-content-mainpage {
+        width: 60%;  /* Take full width on tablet */
+        float: right;  /* Disable float */
+    }
+
+    /* Container for dropdowns to display them side by side */
+    .dropdowns-container-main {
+        display: flex;  /* Enable flexbox for side-by-side layout */
+        gap: 20px;  /* Adjust gap between each dropdown block */
+        flex-wrap: wrap;  /* Ensure dropdowns wrap on smaller screens */
+        overflow: visible;
+        position: relative;  /* Ensure containers are positioned relative to allow absolute positioning inside */
+        z-index: 1;
+    }
+
+    /* Each dropdown block (label + dropdown) */
+    .dropdown-block {
+        flex-grow: 1;  /* Allow blocks to grow equally */
+        min-width: 200px;  /* Ensure dropdown blocks have a minimum width */
+        max-width: 33%;
+        z-index: 1000;
+    }
+
+    .visible-paris-section {
+        flex-grow: 2;
+        min-width: 200px;  /* Ensure dropdown blocks have a minimum width */
+        max-width: 33%;
+    }
+
+    /* Adjustments for dropdown styling */
+    .dropdown-style {
+        width: 100%;             /* Ensure the dropdown takes full width of its container */
+        position: relative;
+        z-index: 1000;
+    }
+
+    /* When the dropdown is expanded, make sure it floats above the rest */
+    .dropdown-style .dropdown-menu {
+        position: absolute;  /* Float the expanded dropdown menu */
+        top: 100%;  /* Ensure it appears just below the dropdown button */
+        left: 0;
+        z-index: 2000;  /* Ensure it's above everything else */
+        width: 100%;  /* Expand to the full width of the dropdown */
+    }
+
+    /* Flexbox container for star ratings and restaurant details */
+    .star-ratings-and-details-container {
+        flex-grow: 0;
+        display: flex;
+        flex-direction: row;  /* Place items in a row (side by side) */
+        gap: 20px;            /* Adjust gap between the star ratings and restaurant details */
+        margin-bottom: 0;
+    }
+
+    /* Star ratings section takes up 50% of the width */
+    .star-filter-section {
+        flex-grow: 1;         /* Allow the section to grow and take available space */
+        max-width: 50%;       /* Set a maximum width for this section */
+        box-sizing: border-box;
+        margin-bottom: 0;
+    }
+
+    /* Restaurant details section takes up the other 50% of the width */
+    .restaurant-details-container {
+        /*background-color: lightcoral;*/
+        flex-grow: 1; /* This ensures it takes up available space */
+        max-width: 50%; /* Restrict the maximum width to 50% */
+        min-width: 50%; /* Ensure it does not shrink below 50% */
+        height: auto;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    /* Star Ratings Section takes full width below the map */
+    .star-ratings-container-main {
+        width: 100%;  /* Full width on tablet */
+        display: flex;
+        justify-content: space-around;  /* Evenly distribute star rating sections */
+        margin-top: 10px;
+    }
+
+    /* Analysis layout changes */
+    .analysis-container {
+        margin-top: 60px; /* Adjust for header */
+    }
+
+    .content-container {
+        padding-left: 30px;
+    }
+
+    .michelin-title-paragraph {
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+
+    .michelin-text-container {
+        width: calc(100% - 30px);
+    }
+
+
+    .region-content-wrapper {
+        padding-right: 30px;
+    }
+
+    .region-description {
+        font-size: 16px;
+    }
+
+    .department-content-wrapper {
+        padding-right: 30px;
+    }
+
+    .department-description {
+        font-size: 16px;
+    }
+
+    .visible-section {
+        padding-right: 30px;
+    }
+
+    .arrondissement-description {
+        font-size: 16px;
+    }
+
+    .ranking-content-wrapper {
+        width: calc(100% - 30px);
+        padding-right: 30px;
+    }
+
+    .ranking-description {
+        font-size: 16px;
+    }
+
+    .demographics-container {
+        padding-right: 30px;
+    }
+
+    .demographics-text-paragraph {
+        font-size: 16px;
+    }
+
+    .wine-container {
+        padding-right: 30px;
+    }
+
+    .wine-text-paragraph {
+        font-size: 16px;
+    }
+}
+
+
+
+

@@ -31,7 +31,7 @@ jobs:
       - name: Check if repository name is no longer a template name
         id: check-template-name
         run: |
-          if [[ ! "${{ github.repository }}" == *"data_template_project_name"* ]]; then
+          if [[ ! "${{ github.repository }}" == *"ukr_energy_dash"* ]]; then
             echo "repository name is no longer a template name."
             echo "no-longer-match=true" >> $GITHUB_OUTPUT
           else
