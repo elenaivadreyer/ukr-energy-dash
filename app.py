@@ -47,8 +47,7 @@ app = dash.Dash(
 )
 server.secret_key = os.getenv("FLASK_SECRET_KEY", str(uuid.uuid4()))
 
-# ================= Layout =================
-app.layout = get_main_layout(unique_oblasts)
+app.layout = get_main_layout(unique_oblasts, stations_df)
 
 app.index_string = """
 <!DOCTYPE html>
@@ -208,18 +207,18 @@ def update_map(
 @app.callback(
     Output("station-details", "children"),
     [
-        Input("map-display", "clickData"), 
-        Input("map-display", "relayoutData"), 
+        Input("map-display", "clickData"),
+        Input("map-display", "relayoutData"),
         Input("oblast-dropdown", "value"),
-        Input("gppd-filter-store", "data")
+        Input("gppd-filter-store", "data"),
     ],
     prevent_initial_call=False,
 )
 def update_station_details(
-    click_data: dict[str, Any] | None, 
-    relayout_data: dict[str, Any] | None, 
+    click_data: dict[str, Any] | None,
+    relayout_data: dict[str, Any] | None,
     selected_oblast: str | None,
-    gppd_filter: dict[str, bool] | None
+    gppd_filter: dict[str, bool] | None,
 ) -> html.Div | str:
     """
     Update station details panel based on map clicks and interactions.
@@ -236,24 +235,22 @@ def update_station_details(
     """
     ctx = dash.callback_context
     triggered = ctx.triggered[0]["prop_id"] if ctx.triggered else ""
-    
+
     # Clear station details when dropdown changes, map is manipulated (zoom/pan), or filters change
     if "oblast-dropdown" in triggered or "relayoutData" in triggered or "gppd-filter-store" in triggered:
         return ""
-    
+
     if click_data and "points" in click_data and len(click_data["points"]) > 0:
         point = click_data["points"][0]
         station_index = point.get("customdata")
         if station_index is not None and station_index in stations_df.index:
             station_row = stations_df.loc[int(station_index)]
             return get_station_details(station_row)
-    
+
     return ""
 
 
 # ================= Lasso / Selected Stations Table =================
-
-
 @app.callback(
     Output("stations-table", "data"),
     Input("oblast-dropdown", "value"),

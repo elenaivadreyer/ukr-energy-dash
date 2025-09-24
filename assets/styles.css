@@ -54,7 +54,7 @@ body {
     margin-left: 50px;
     color: black;
     font-weight: bold;
-    margin-top: 12px;
+    margin-top: 15px;
     margin-bottom: 12px;
 }
 
@@ -141,7 +141,7 @@ body {
     margin-bottom: 15px !important;
     padding: 5px 5px !important;
     background-color: #f9f9f9;
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
     color: #333;
     border-radius: 5px;
     box-sizing: border-box;
@@ -158,6 +158,24 @@ body {
 
 .note-link:hover {
     text-decoration: underline;
+}
+
+.data-note-text-1 {
+    font-size: 0.8rem;   /* smaller than default */
+    color: #444;         /* softer grey */
+    margin-bottom: 6px;  /* a bit tighter spacing */
+}
+
+.data-note-text-2 {
+    font-size: 0.6rem;   /* smaller than default */
+    color: #444;         /* softer grey */
+    margin-bottom: 6px;  /* a bit tighter spacing */
+}
+
+.data-number {
+    color: #b30000;      /* deep red */
+    font-family: monospace;
+    font-weight: bold;
 }
 
 

@@ -151,7 +151,8 @@ ignore = [
     "N801", #Class name {name} should use CapWords convention --> not a desired rule at the moment, since may class names currently violate this rule. TO DO: Enforce later
     "COM812", #creates issues with formatter
     "D203", #creates issues with formatter
-    "D401" #non-imperative-mood: Not a desired rule, therefore excluded
+    "D401", #non-imperative-mood: Not a desired rule, therefore excluded
+    "PLR0912", #Too many lines in module
 ]
 
 # Allows unused variables when underscore-prefixed

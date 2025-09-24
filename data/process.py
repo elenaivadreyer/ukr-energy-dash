@@ -6,6 +6,7 @@ from OpenStreetMap using the Overpass API and matching with the Global Power
 Plant Database (GPPD).
 """
 
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,9 @@ import geopandas as gpd
 import pandas as pd
 import requests
 from shapely.geometry import LineString, MultiPolygon, Point, Polygon
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 DATA_ASSETS_PATH = Path("/workspaces/ukr_energy_dash/assets/data")
@@ -39,19 +43,41 @@ def fetch_overpass_data(query: str) -> dict[str, Any]:
 
 
 def elements_to_geodataframe(data: dict) -> gpd.GeoDataFrame:
-    """Convert Overpass JSON → GeoDataFrame (points/lines/polygons)."""
+    """
+    Convert Overpass JSON → GeoDataFrame (points/lines/polygons). Only keeps elements with valid geometries.
+
+    Args:
+        data: JSON response from Overpass API
+
+    Returns:
+        GeoDataFrame with geometries.
+
+    """
+    # Map nodes and ways
     node_by_id = {el["id"]: el for el in data["elements"] if el["type"] == "node"}
     way_by_id = {el["id"]: el for el in data["elements"] if el["type"] == "way"}
 
     features = []
+
     for el in data["elements"]:
         geom = None
+
         if el["type"] == "node":
-            geom = Point(el["lon"], el["lat"])
+            if "lon" in el and "lat" in el:
+                geom = Point(el["lon"], el["lat"])
+
         elif el["type"] == "way":
             coords = [(node_by_id[n]["lon"], node_by_id[n]["lat"]) for n in el.get("nodes", []) if n in node_by_id]
             if coords:
-                geom = Polygon(coords) if coords[0] == coords[-1] else LineString(coords)
+                if coords[0] == coords[-1] and len(coords) >= 4:
+                    poly = Polygon(coords)
+                    if poly.is_valid and not poly.is_empty:
+                        geom = poly
+                else:
+                    line = LineString(coords)
+                    if line.is_valid and not line.is_empty:
+                        geom = line
+
         elif el["type"] == "relation":
             polys = []
             for m in el.get("members", []):
@@ -63,12 +89,19 @@ def elements_to_geodataframe(data: dict) -> gpd.GeoDataFrame:
                             for n in way.get("nodes", [])
                             if n in node_by_id
                         ]
-                        if coords and coords[0] == coords[-1]:
-                            polys.append(Polygon(coords))
+                        if len(coords) >= 3:  # relaxed: allow polygons even if not perfectly closed
+                            try:
+                                poly = Polygon(coords)
+                                if poly.is_valid:
+                                    polys.append(poly)
+                            except Exception:
+                                logger.warning(f"Invalid polygon for way {way['id']} in relation {el['id']}")
+                                continue
             if polys:
                 geom = MultiPolygon(polys) if len(polys) > 1 else polys[0]
 
-        if geom:
+        # Only keep elements with valid geometry
+        if geom is not None and geom.is_valid and not geom.is_empty:
             features.append({"osm_id": el["id"], "osm_type": el["type"], **el.get("tags", {}), "geometry": geom})
 
     return gpd.GeoDataFrame(features, crs="EPSG:4326")
@@ -85,6 +118,7 @@ def filter_power_stations(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         Filtered GeoDataFrame with only relevant power stations and substations
 
     """
+    # important filter
     mask = gdf.get("plant:source").notna() | (gdf.get("substation") == "transmission")
     gdf = gdf[mask].drop_duplicates(subset=["osm_id", "osm_type"])
     # reduce columns
@@ -195,14 +229,33 @@ def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     return ukraine_gdf
 
 
+def fetch_critical_relations(osm_ids: list[int]) -> dict:
+    """Fetch full geometry for critical multipolygon relations."""
+    import itertools
+
+    critical_data_list = []
+    for osm_id in osm_ids:
+        query = f"""
+        [out:json][timeout:180];
+        relation({osm_id});
+        out geom qt;
+        """
+        data = fetch_overpass_data(query)
+        critical_data_list.append(data)
+
+    # Flatten all elements from individual responses
+    critical_elements = list(itertools.chain.from_iterable(d["elements"] for d in critical_data_list))
+    return {"elements": critical_elements}
+
+
 def main() -> None:
     """
     Main function to process Ukrainian power stations data.
 
-    Downloads power station data from OpenStreetMap, processes it,
-    assigns oblasts, matches with GPPD data, and saves the results.
+    Implements two-step fetch: bulk skeleton + individual critical multipolygons.
     """
-    query = """
+    # --- Bulk skeleton query ---
+    bulk_query = """
     [out:json][timeout:180];
     area["ISO3166-1"="UA"][admin_level=2]->.a;
     (
@@ -215,22 +268,35 @@ def main() -> None:
     );
     out body; >; out skel qt;
     """
+    print("Downloading bulk OSM power stations (skeleton)...")
+    bulk_data = fetch_overpass_data(bulk_query)
 
-    print("Downloading OSM power stations...")
-    data = fetch_overpass_data(query)
-    gdf = elements_to_geodataframe(data)
+    # --- Critical multipolygon relations ---
+    critical_relations = [7317657]  # Kakhovka HPP, add others as needed
+    print(f"Downloading critical relations with full geometry: {critical_relations}")
+    critical_data = fetch_critical_relations(critical_relations)
+
+    # --- Combine bulk + critical elements ---
+    all_elements = bulk_data["elements"] + critical_data["elements"]
+    combined_data = {"elements": all_elements}
+
+    # --- Convert to GeoDataFrame ---
+    gdf = elements_to_geodataframe(combined_data)
+    print(f"Total features after conversion: {len(gdf)}")
+
+    # --- Filter valid power stations / substations ---
     gdf = filter_power_stations(gdf)
+    print(f"Total features after filtering: {len(gdf)}")
 
-    print("Assigning oblasts...")
+    # --- Assign oblasts ---
     gdf, oblasts_gdf = assign_oblasts(gdf)
 
-    print("Matching with GPPD...")
+    # --- Match with GPPD ---
     gdf = match_with_gppd(gdf)
 
-    # Save outputs
+    # --- Save outputs ---
     stations_path = DATA_ASSETS_PATH / "power_stations_with_oblasts.geojson"
     oblasts_path = DATA_ASSETS_PATH / "ukraine_oblasts.geojson"
-
     gdf.to_file(stations_path, driver="GeoJSON")
     oblasts_gdf.to_file(oblasts_path, driver="GeoJSON")
 

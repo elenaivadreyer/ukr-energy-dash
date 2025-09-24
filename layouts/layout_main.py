@@ -5,7 +5,10 @@ This module defines the main layout structure, components, and UI elements
 for the Ukraine Energy Dashboard including headers, footers, and content areas.
 """
 
+import geopandas as gpd
 from dash import dash_table, dcc, html
+
+from components.utils import generate_data_note
 
 unique_oblasts = [
     "Cherkasy",
@@ -38,7 +41,6 @@ unique_oblasts = [
 ]
 
 
-# ---------------- Header ---------------- #
 def get_header_with_buttons() -> html.Div:
     """
     Create the header section with title and navigation buttons.
@@ -60,7 +62,6 @@ def get_header_with_buttons() -> html.Div:
     )
 
 
-# ---------------- Footer ---------------- #
 def get_footer() -> html.Div:
     """
     Create the footer section with links and credits.
@@ -88,12 +89,13 @@ def get_footer() -> html.Div:
     )
 
 
-def get_main_content_with_oblast(unique_oblasts: list[str]) -> html.Div:
+def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.GeoDataFrame) -> html.Div:
     """
     Create the main content area with sidebar and map components.
 
     Args:
         unique_oblasts: List of oblast names for the dropdown filter
+        stations_df: GeoDataFrame containing power station data for generating data note
 
     Returns:
         Dash HTML Div containing the main dashboard content
@@ -106,32 +108,9 @@ def get_main_content_with_oblast(unique_oblasts: list[str]) -> html.Div:
                 [html.H5("Explore Ukraine's power stations", className="site-description")],
                 className="description-container",
             ),
-            html.Div(
-                [
-                    html.Small(
-                        [
-                            "Station locations were retrieved from ",
-                            html.A(
-                                "OpenStreetMap",
-                                href="https://www.openstreetmap.org/",
-                                target="_blank",
-                                className="note-link",
-                            ),
-                            " using a custom Overpass query. ",
-                            "These points were validated against the ",
-                            html.A(
-                                "Global Power Plant Database",
-                                href="https://datasets.wri.org/dataset/globalpowerplantdatabase",
-                                target="_blank",
-                                className="note-link",
-                            ),
-                            " through spatial proximity checks.",
-                        ]
-                    )
-                ],
-                className="data-note",
-            ),
-            # 🔹 Filters
+            # Data note
+            generate_data_note(stations_df),
+            # Filters
             html.Div(
                 [
                     html.H6("Filters", className="dropdown-title"),
@@ -257,13 +236,13 @@ def get_main_content_with_oblast(unique_oblasts: list[str]) -> html.Div:
     return html.Div([top_section, table_section], className="main-content")
 
 
-# ---------------- Main Layout ---------------- #
-def get_main_layout(unique_oblasts: list[str]) -> html.Div:
+def get_main_layout(unique_oblasts: list[str], stations_df: gpd.GeoDataFrame) -> html.Div:
     """
     Create the complete main layout for the dashboard.
 
     Args:
         unique_oblasts: List of oblast names for the dropdown filter
+        stations_df: GeoDataFrame containing power station data for generating data note
 
     Returns:
         Dash HTML Div containing the complete dashboard layout
@@ -272,7 +251,7 @@ def get_main_layout(unique_oblasts: list[str]) -> html.Div:
     return html.Div(
         [
             html.Div(children=[get_header_with_buttons()], className="header"),
-            html.Div(children=[get_main_content_with_oblast(unique_oblasts)], className="body"),
+            html.Div(children=[get_main_content_with_oblast(unique_oblasts, stations_df)], className="body"),
             get_footer(),
         ],
         className="main-layout",

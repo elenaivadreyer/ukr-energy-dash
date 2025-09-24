@@ -14,24 +14,32 @@ from dash import dcc, html
 from matplotlib import colors as mcolors
 from shapely.geometry import MultiPolygon, Point, Polygon
 
-# ---------------- Color scheme ---------------- #
 power_source_colors = {
-    "solar": "#FFB84D",
-    "nuclear": "#e31a1c",
-    "gas;coal": "#640A64",
-    "gas": "#640A64",
-    "oil;gas": "#640A64",
-    "coal": "#6a3d9a",
-    "wind": "#33a02c",
-    "hydro": "#4871EF",
-    "coal;oil": "#640A64",
-    "gas;mazut": "#640A64",
-    "coal;gas;oil": "#640A64",
-    "gas;oil": "#640A64",
-    "biogas": "#33a02c",
-    "waste": "#FFFFFF",
-    "diesel": "#640A64",
-    "oil;gas;diesel": "#640A64",
+    # Renewables
+    "solar": "#FDBF00",  # bright golden yellow
+    "wind": "#2CA02C",  # medium-dark green
+    "hydro": "#1F78B4",  # deep blue
+    "biogas": "#66A61E",  # olive green
+    "biomass": "#B2DF8A",  # light green
+    "wood": "#8C510A",  # natural brown
+    "waste": "#B15928",  # earthy rust orange
+    # Nuclear
+    "nuclear": "#E31A1C",  # bold red (stands out strongly)
+    # Fossil fuels (dark shades)
+    "coal": "#252525",  # near-black
+    "gas": "#54278F",  # deep violet
+    "oil": "#843C39",  # dark brownish red
+    "diesel": "#6E016B",  # very dark purple
+    "mazut": "#4B0082",  # indigo
+    # Mixed fossil combinations (keep them dark & distinct)
+    "gas;coal": "#3F007D",
+    "gas;oil": "#5E3C99",
+    "coal;oil": "#4A1486",
+    "coal;gas": "#2D004B",
+    "coal;gas;oil": "#1B0033",
+    "gas;mazut": "#35004D",
+    "oil;gas": "#5E3C99",
+    "oil;gas;diesel": "#4E005F",
 }
 
 
@@ -61,7 +69,7 @@ def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
         stations_df: GeoDataFrame containing station data with geometry and attributes
 
     """
-    # ---------------- Plants ---------------- #
+    # Plants
     plants_df = stations_df[stations_df["power"] == "plant"]
     if not plants_df.empty:
         lats, lons, colors, indices, hovertexts = [], [], [], [], []
@@ -91,7 +99,7 @@ def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
             )
         )
 
-    # ---------------- Substations ---------------- #
+    # Substations
     subs_df = stations_df[stations_df["power"] == "substation"]
     if not subs_df.empty:
         lats, lons, hovertexts = [], [], []
@@ -124,7 +132,7 @@ def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
     return fig
 
 
-# ---------------- Default map ---------------- #
+# Default map
 def default_map_figure(stations_df: gpd.GeoDataFrame, outer_ukraine: gpd.GeoDataFrame | None = None) -> go.Figure:
     """
     Default whole-Ukraine view with all stations (single trace).
@@ -204,11 +212,11 @@ def generate_map_figure(
     """
     fig = go.Figure()
 
-    # 1️⃣ Reset or no selection → full Ukraine
+    # Reset or no selection → full Ukraine
     if reset or (selected_oblast is None and not click_data):
         fig = default_map_figure(stations_df, outer_ukraine=outer_ukraine)
 
-    # 2️⃣ ClickData present → zoom to clicked station
+    # ClickData present → zoom to clicked station
     elif click_data and "points" in click_data and len(click_data["points"]) > 0:
         point = click_data["points"][0]
         station_index = point.get("customdata")
@@ -257,7 +265,7 @@ def generate_map_figure(
             fig.update_layout(dragmode="lasso", hovermode="closest")
             return fig
 
-    # 3️⃣ selected_oblast → zoom to oblast
+    # selected_oblast → zoom to oblast
     elif selected_oblast:
         filtered_oblast = oblasts_gdf[oblasts_gdf["oblast_name_en"] == selected_oblast]
         if not filtered_oblast.empty:
@@ -272,7 +280,7 @@ def generate_map_figure(
                             lat=list(y),
                             lon=list(x),
                             mode="lines",
-                            line={"width": 2, "color": "black"},
+                            line={"width": 1, "color": "black"},
                             hoverinfo="none",
                             showlegend=False,
                         )
@@ -292,13 +300,13 @@ def generate_map_figure(
             )
             return fig
 
-    # 4️⃣ fallback → full Ukraine
+    # fallback → full Ukraine
     fig = default_map_figure(stations_df, outer_ukraine=outer_ukraine)
     fig.update_layout(dragmode="lasso", hovermode="closest")
     return fig
 
 
-# ---------------- Station details ---------------- #
+# Station details
 def get_station_details(row: pd.Series) -> html.Div:
     """
     Generate a detailed HTML Div for a power station.
@@ -327,7 +335,7 @@ def get_station_details(row: pd.Series) -> html.Div:
 
     details_layout = html.Div(
         [
-            html.H5(station_name_en, style={"marginBottom": "10px", "color": color, "fontSize": "18px"}),
+            html.H5(station_name_en, style={"marginBottom": "10px", "color": color, "fontSize": "16px"}),
             html.Div(
                 [
                     html.Strong("Station Name:"),
@@ -355,19 +363,107 @@ def get_station_details(row: pd.Series) -> html.Div:
                     f" {centroid.y}, {centroid.x}",
                     html.Br(),
                 ],
-                style={"marginBottom": "10px"},
+                style={"marginBottom": "10px", "fontSize": "14px"},
             ),
             html.Div(
                 [
                     html.Strong("Geometry:"),
-                    dcc.Textarea(value=str(geom), style={"width": "100%", "height": "80px"}, readOnly=True),
+                    dcc.Textarea(
+                        value=str(geom), style={"width": "100%", "height": "80px", "fontSize": "12px"}, readOnly=True
+                    ),
                 ],
-                style={"marginBottom": "10px"},
+                style={"marginBottom": "10px", "fontSize": "14px"},
             ),
-            html.Div([html.A("Open in Google Earth", href=google_earth_link, target="_blank")]),
+            html.Div(
+                [
+                    html.A("Open in Google Earth", href=google_earth_link, target="_blank"),
+                ],
+                style={"fontSize": "14px", "textDecoration": "underline"},
+            ),
         ],
         className="station-details",
         style={"border": f"2px solid {color}", "padding": "10px", "borderRadius": "5px", "backgroundColor": "#f9f9f9"},
     )
 
     return details_layout
+
+
+def generate_data_note(gdf: gpd.GeoDataFrame) -> html.Div:
+    """
+    Generate a note inside the sidebar summarizing the dataset.
+
+    Args:
+        gdf: GeoDataFrame containing station data with attributes
+
+    Returns:
+        Dash HTML Div component with formatted data note
+
+    """
+    # Split plants vs substation
+    plants_df = gdf[gdf["power"] == "plant"].copy()
+    substation_count = (gdf["power"] == "substation").sum()
+
+    # Define categories
+    renewable = {"solar", "hydro", "wind", "biomass", "biogas", "waste", "wood"}
+    fossil = {"coal", "gas", "oil", "diesel", "mazut"}
+
+    renew_count, fossil_count, nuclear_count = 0, 0, 0
+
+    for sources in plants_df["plant:source"].dropna():
+        fuels = set(str(sources).split(";"))
+        if "nuclear" in fuels:
+            nuclear_count += 1
+        elif any(f in renewable for f in fuels):
+            renew_count += 1
+        elif any(f in fossil for f in fuels):
+            fossil_count += 1
+        else:
+            # catch uncategorized sources
+            renew_count += 0
+
+    total_plants = plants_df.shape[0]
+    total_stations = total_plants + substation_count
+
+    return html.Div(
+        [
+            html.P(
+                [
+                    "Station locations were retrieved from ",
+                    html.A("OpenStreetMap", href="https://www.openstreetmap.org", target="_blank"),
+                    " using a custom Overpass query and validated against the ",
+                    html.A(
+                        "Global Power Plant Database",
+                        href="https://datasets.wri.org/dataset/globalpowerplantdatabase",
+                        target="_blank",
+                    ),
+                    " through spatial proximity checks.",
+                ],
+                className="data-note-text-1",
+            ),
+            html.P(
+                [
+                    "The dataset contains ",
+                    html.Span(total_stations, className="data-number"),
+                    " facilities in total: ",
+                    html.Span(total_plants, className="data-number"),
+                    " power plants and ",
+                    html.Span(substation_count, className="data-number"),
+                    " transmission substations.",
+                ],
+                className="data-note-text-2",
+            ),
+            html.P(
+                [
+                    "Among the power plants: ",
+                    html.Span(renew_count, className="data-number"),
+                    " renewable (solar, hydro, wind, biomass, etc.), ",
+                    html.Span(fossil_count, className="data-number"),
+                    " fossil-fuel (gas, coal, oil, etc.), and ",
+                    html.Span(nuclear_count, className="data-number"),
+                    " nuclear stations.",
+                ],
+                className="data-note-text-2",
+            ),
+        ],
+        className="data-note",
+    )

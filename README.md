@@ -7,6 +7,7 @@ An interactive dashboard for visualizing Ukraine's power infrastructure, built w
 <!-- Placeholder for demo video -->
 *Coming soon: Short demo video showing dashboard features*
 
+
 ## Data Sources
 
 The dashboard integrates data from multiple sources:
@@ -14,6 +15,10 @@ The dashboard integrates data from multiple sources:
 - **[OpenStreetMap](https://www.openstreetmap.org/)**: Power station locations retrieved via custom Overpass API queries
 - **[Global Power Plant Database (GPPD)](https://datasets.wri.org/dataset/globalpowerplantdatabase)**: Validation and additional power plant information through spatial proximity matching
 - **[GADM](https://geodata.ucdavis.edu/gadm/)**: Administrative boundaries for Ukrainian oblasts
+
+## Components
+
+tbd
 
 ## Quick Start
 
@@ -67,3 +72,7 @@ ukr_energy_dash/
    ```bash
    pre-commit run --all-files
    ```
+
+## Inspiration
+
+The layout of this app was inspired by the [Michelin Guide to France](https://restaurant-guide-france.net/) developed by [pineapple-bois](https://github.com/pineapple-bois/Michelin_App_Development).
