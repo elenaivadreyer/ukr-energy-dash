@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
-DATA_ASSETS_PATH = Path("/workspaces/ukr_energy_dash/assets/data")
+DATA_ASSETS_PATH = Path(__file__).parent.parent / "assets" / "data"
 DATA_ASSETS_PATH.mkdir(parents=True, exist_ok=True)
 
 
