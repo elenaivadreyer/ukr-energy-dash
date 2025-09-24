@@ -6,8 +6,7 @@ The live app can be accessed [here](https://50df7176-a5f3-40b7-98e3-0b5a4a5fd93a
 
 ## Demo
 
-<!-- Placeholder for demo video -->
-*Coming soon: Short demo video showing dashboard features*
+![img](assets/ukr-energy-dash-demo-low.gif)
 
 
 ## Data Sources
