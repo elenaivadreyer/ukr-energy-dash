@@ -33,6 +33,10 @@ dependencies = [
     'Flask>=2.2.0',
 ]
 
+# Explicitly prevent package discovery - this is a Dash app, not a package
+[tool.setuptools]
+packages = []
+
 [project.optional-dependencies]
 test = [
     #"bandit[toml]==1.7.7", #commented due to ruff implementation, can be deleted in a later iteration
@@ -279,29 +283,32 @@ badge-format = "svg"
 #pretty = true
 
 [tool.pyright]
-include = ["src"]
+include = ["."]
 exclude = [
     "**/node_modules",
     "**/__pycache__",
+    ".venv",
+    "build",
+    "dist"
 ]
-venv = "env37"
+venv = ".venv"
 
 reportMissingImports = true
 reportMissingTypeStubs = false
 
-pythonVersion = "3.7"
+pythonVersion = "3.11"
 pythonPlatform = "Linux"
 
 executionEnvironments = [
-  { root = "src" }
+  { root = "." }
 ]
 
 # Warning received -- PytestConfigWarning: Unknown config option: adopts.
 # TODO: adopts is commented out until resolved. Please use "make run_pytest_with_cov" until further notice.
 [tool.pytest.ini_options]
-# adopts = "--cov-report xml:coverage.xml --cov src --cov-fail-under 0 --cov-append -m 'not integration'"
+# adopts = "--cov-report xml:coverage.xml --cov . --cov-fail-under 0 --cov-append -m 'not integration'"
 pythonpath = [
-  "src"
+  "."
 ]
 testpaths = "tests"
 junit_family = "xunit2"

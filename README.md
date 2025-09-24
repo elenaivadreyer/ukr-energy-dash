@@ -24,7 +24,7 @@ tbd
 
 1. **Install dependencies:**
    ```bash
-   pip install -e .
+   pip install -r requirements.txt
    ```
 
 2. **Run the dashboard:**
@@ -59,7 +59,8 @@ ukr_energy_dash/
 
 1. **Install development dependencies:**
    ```bash
-   pip install -e ".[test]"
+   pip install -r requirements.txt
+   pip install .[test]
    ```
 
 2. **Code formatting and linting:**

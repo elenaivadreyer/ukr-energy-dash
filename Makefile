@@ -50,14 +50,15 @@ create_venv:
 	python3 -m venv .venv
 	source .venv/bin/activate && \
 	python3 -m pip install --upgrade pip && \
-	echo "Installing dependencies needed for tests." && \
-	pip install -e .[test] --force-reinstall --no-cache-dir && \
+	echo "Installing dependencies from requirements.txt and pyproject.toml." && \
+	pip install -r requirements.txt --force-reinstall --no-cache-dir && \
+	pip install .[test] --force-reinstall --no-cache-dir && \
 	echo "Virtual environment created and dependencies installed."
 
 run_pytest_with_cov:
 	echo "Running unit tests with coverage now..."
 	source .venv/bin/activate && \
-	python3 -m pytest --cov=src/ukr_energy_dash --cov-report=term-missing --cov-report=xml --cov-append --cov-fail-under=0
+	python3 -m pytest --cov=. --cov-report=term-missing --cov-report=xml --cov-append --cov-fail-under=0
 	echo "Running unit tests with coverage is complete."
 
 check_coverage_badge_for_any_changes:

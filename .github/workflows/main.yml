@@ -49,9 +49,12 @@ jobs:
       - name: INFO
         run: |
           make system_information
-      - name: Linting review precommit
+      - name: Install pre-commit and run linting review
         if: always()
-        run: source .venv/bin/activate && pre-commit run --all-files
+        run: |
+          source .venv/bin/activate && \
+          pip install pre-commit && \
+          pre-commit run --all-files
       - name: Test with pytest including coverage check
         env:
           POSTGRES_USER: "project_user"
