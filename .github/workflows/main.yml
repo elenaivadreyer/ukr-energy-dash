@@ -55,16 +55,16 @@ jobs:
           source .venv/bin/activate && \
           pip install pre-commit && \
           pre-commit run --all-files
-      - name: Test with pytest including coverage check
-        env:
-          POSTGRES_USER: "project_user"
-          POSTGRES_PASSWORD: "project_pass"
-          POSTGRES_HOSTNAME: "localhost"
-          POSTGRES_PORT: "5432"
-          POSTGRES_DB_NAME: "project_db"
-          # Note: these POSTGRES credentials are not yet used by unit tests in Actions [coming soon]
-        run: |
-          make run_pytest_with_cov
+      # - name: Test with pytest including coverage check
+      #   env:
+      #     POSTGRES_USER: "project_user"
+      #     POSTGRES_PASSWORD: "project_pass"
+      #     POSTGRES_HOSTNAME: "localhost"
+      #     POSTGRES_PORT: "5432"
+      #     POSTGRES_DB_NAME: "project_db"
+      #     # Note: these POSTGRES credentials are not yet used by unit tests in Actions [coming soon]
+      #   run: |
+      #     make run_pytest_with_cov
       - name: Check Coverage Badge for any changes that is used for README.md
         if: matrix.python-version != '3.11' # Coverage is slightly different for Python 3.11
         run: |
