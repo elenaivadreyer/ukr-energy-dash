@@ -222,6 +222,12 @@ def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     # Collapse → True if at least one match per station
     overlap_flags = joined.groupby("index")["index_right"].apply(lambda x: x.notna().any())
 
+    # Print stats for GPPD plants
+    matched_gppd = joined["index_right"].dropna().unique()
+    n_matched_gppd = len(matched_gppd)
+    n_total_gppd = len(gdf_gppd_ua)
+    print(f"{n_matched_gppd}/{n_total_gppd} GPPD plants matched with OSM stations")
+
     # Assign back
     ukraine_gdf = ukraine_gdf.copy()
     ukraine_gdf["gppd_overlap"] = ukraine_gdf.index.map(overlap_flags)
