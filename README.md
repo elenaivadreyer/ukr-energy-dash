@@ -13,8 +13,8 @@ The live app can be accessed [here](https://50df7176-a5f3-40b7-98e3-0b5a4a5fd93a
 
 The dashboard integrates data from multiple sources through various APIs and services:
 
-- **[OpenStreetMap](https://www.openstreetmap.org/)**: Power station locations retrieved via custom [Overpass API](https://overpass-api.de/api/interpreter) queries targeting power generation facilities across Ukraine
-- **[Global Power Plant Database (GPPD)](https://datasets.wri.org/dataset/globalpowerplantdatabase)**: Validation and additional power plant information through spatial proximity matching with WRI's comprehensive global database
+- **[OpenStreetMap](https://www.openstreetmap.org/)**: Power station locations retrieved via custom [Overpass Turbo API](https://overpass-turbo.eu/) queries targeting power plants and transmission substations across Ukraine
+- **[Global Power Plant Database (GPPD)](https://datasets.wri.org/dataset/globalpowerplantdatabase)**: Validation and additional power plant information through spatial proximity matching with WRI's global database
 - **[GADM](https://geodata.ucdavis.edu/gadm/)**: Administrative boundaries for Ukrainian oblasts sourced from GADM database version 4.1
 - **[Google Earth Web](https://earth.google.com/web/)**: Direct integration allowing users to explore power station locations in satellite imagery with one-click access
 
