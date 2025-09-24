@@ -76,7 +76,7 @@ def get_footer() -> html.Div:
                 children=[
                     html.A(
                         html.I(className="fa-brands fa-github"),
-                        href="https://github.com/elenaivadreyer/ukr_energy_dash",
+                        href="https://github.com/elenaivadreyer/ukr-energy-dash",
                         target="_blank",
                         className="github-link",
                         style={"margin-left": "10px", "color": "#333", "text-decoration": "none"},

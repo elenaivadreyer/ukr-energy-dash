@@ -3,7 +3,7 @@ requires = ["setuptools >= 69.1.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ukr_energy_dash"
+name = "ukr-energy-dash"
 version = "0.1.0"
 description = "Ukraine Energy Dashboard - A Plotly Dash application for visualizing Ukraine energy data"
 readme = "README.md"
@@ -71,9 +71,9 @@ test = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/elenaivadreyer/ukr_energy_dash/tree/main#readme"
-Source = "https://github.com/elenaivadreyer/ukr_energy_dash"
-Tracker = "https://github.com/elenaivadreyer/ukr_energy_dash/issues"
+Documentation = "https://github.com/elenaivadreyer/ukr-energy-dash/tree/main#readme"
+Source = "https://github.com/elenaivadreyer/ukr-energy-dash"
+Tracker = "https://github.com/elenaivadreyer/ukr-energy-dash/issues"
 
 #Global ruff configuration
 [tool.ruff]

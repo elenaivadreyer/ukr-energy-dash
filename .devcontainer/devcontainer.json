@@ -17,7 +17,7 @@
 		"vscode": {
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
-				"python.defaultInterpreterPath": "/workspaces/ukr_energy_dash/.venv/bin/python",
+				"python.defaultInterpreterPath": "/workspaces/ukr-energy-dash/.venv/bin/python",
 				"python.terminal.activateEnvironment": true,
 				// "python.terminal.activateEnvInCurrentTerminal": true,
 				"python.testing.pytestArgs": [
@@ -45,12 +45,12 @@
 						]
 					}
 				],
-				// NOTE: some paths referring to the ones of ukr_energy_dash/.venv is recommended (instead of built-in standard paths): [TODO: this is to be checked]
-				// "ukr_energy_dash" package for example can be noticed that it exists.
+				// NOTE: some paths referring to the ones of ukr-energy-dash/.venv is recommended (instead of built-in standard paths): [TODO: this is to be checked]
+				// "ukr-energy-dash" package for example can be noticed that it exists.
 				// pyproject.toml can be correctly considered (flake8 line width for example)
-				"python.testing.pytestPath": "/workspaces/ukr_energy_dash/.venv/bin/pytest"
+				"python.testing.pytestPath": "/workspaces/ukr-energy-dash/.venv/bin/pytest"
 				// mypy seems to be not working properly in VSCode, so it's disabled for now. Kept for now because mypy is not replaced by Ruff.
-				// "mypy-type-checker.path": ["/workspaces/ukr_energy_dash/.venv/bin/mypy"],
+				// "mypy-type-checker.path": ["/workspaces/ukr-energy-dash/.venv/bin/mypy"],
 				// "mypy-type-checker.args": ["--config-file=pyproject.toml"]
 			},
 			// Add the IDs of extensions you want installed when the container is created.
@@ -88,9 +88,9 @@
 		}
 	},
 	// codespaces does not sometimes git with current repository properly, safe.directory approach is added here
-	"updateContentCommand": "git config --global --add safe.directory /workspaces/ukr_energy_dash; make codespaces_only",
+	"updateContentCommand": "git config --global --add safe.directory /workspaces/ukr-energy-dash; make codespaces_only",
 	// NOTE As of July 2025 due to codespace changes itself, this extra .venv activation is needed to really activate .venv properly.
-	"postCreateCommand": "echo 'source /workspaces/ukr_energy_dash/.venv/bin/activate' >> ~/.bashrc",
+	"postCreateCommand": "echo 'source /workspaces/ukr-energy-dash/.venv/bin/activate' >> ~/.bashrc",
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	// NOTE: root is used on purpose - only for Codespaces Development Environment. [Hint: Makefile and sudo-users when using it]
 	"remoteUser": "root",

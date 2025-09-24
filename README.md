@@ -80,7 +80,7 @@ The dashboard provides comprehensive visualization and analysis capabilities for
 ## Project Structure
 
 ```
-ukr_energy_dash/
+ukr-energy-dash/
 ├── app.py                 # Main Dash application
 ├── assets/                # Static files and data
 │   ├── data/              # Processed geospatial data files
