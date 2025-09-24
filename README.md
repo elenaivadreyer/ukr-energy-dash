@@ -1,4 +1,4 @@
-# Ukraine Energy Infrastrcuture Dashboard
+# Ukraine Energy Infrastructure Dashboard
 
 An interactive dashboard for visualizing Ukraine's power infrastructure, built with Plotly Dash.
 
