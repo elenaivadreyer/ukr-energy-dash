@@ -219,7 +219,7 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
             ),
             html.Div(
                 children=[
-                    html.Span("Download CSV", className="download-text"),  # text next to button
+                    html.Span("Download", className="download-text"),  # text next to button
                     html.Button(
                         html.I(className="fa-solid fa-download"),  # Font Awesome icon
                         id="download-button",

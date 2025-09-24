@@ -31,6 +31,7 @@ dependencies = [
     'matplotlib>=3.8.0',
     'python-dotenv>=1.0.0',
     'Flask>=2.2.0',
+    'openpyxl>=3.1.5',
 ]
 
 # Explicitly prevent package discovery - this is a Dash app, not a package

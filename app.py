@@ -304,9 +304,9 @@ def update_table(
     State("stations-table", "data"),
     prevent_initial_call=True,
 )
-def download_csv(n_clicks: int | None, table_data: list[dict[str, Any]] | None) -> dict[str, Any] | None:
+def generate_excel_download(n_clicks: int | None, table_data: list[dict[str, Any]] | None) -> dict[str, Any] | None:
     """
-    Generate CSV download for the current table data.
+    Generate Excel download for the current table data.
 
     Args:
         n_clicks: Number of times download button was clicked
@@ -318,10 +318,14 @@ def download_csv(n_clicks: int | None, table_data: list[dict[str, Any]] | None) 
     """
     if not table_data:
         return None
+
     df = pd.DataFrame(table_data)
-    # save with a timestamp
     timestamp = dt.datetime.now().strftime("%Y%m%d")
-    return dcc.send_data_frame(df.to_csv, f"ukraine_power_stations_osm_{timestamp}.csv", index=False)
+
+    # Use dcc.send_data_frame to send the Excel file
+    return dcc.send_data_frame(
+        df.to_excel, f"ukraine_power_stations_osm_{timestamp}.xlsx", index=False, engine="openpyxl"
+    )
 
 
 # ================= Run Server =================
