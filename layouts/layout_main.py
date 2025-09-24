@@ -53,7 +53,7 @@ def get_header_with_buttons() -> html.Div:
         children=[
             html.Div(
                 [
-                    html.H1("Ukraine Power Stations Dashboard", className="title-section"),
+                    html.H1("Ukraine Energy Infrastrcuture Dashboard", className="title-section"),
                 ],
                 className="header-title",
             ),
@@ -105,7 +105,7 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
     sidebar_content = html.Div(
         [
             html.Div(
-                [html.H5("Explore Ukraine's power stations", className="site-description")],
+                [html.H5("Explore Ukraine's power and substations", className="site-description")],
                 className="description-container",
             ),
             # Data note
