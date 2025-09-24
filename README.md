@@ -2,6 +2,8 @@
 
 An interactive dashboard for visualizing Ukraine's power infrastructure, built with Plotly Dash.
 
+The live app can be accessed [here](https://50df7176-a5f3-40b7-98e3-0b5a4a5fd93a.plotly.app/).
+
 ## Demo
 
 <!-- Placeholder for demo video -->
