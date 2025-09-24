@@ -163,4 +163,4 @@ cython_debug/
 #.idea/
 
 /* assets directory */
-assets/ukr-energy-dash-demo-low.gif
+/* assets/ukr-energy-dash-demo-low.gif */
