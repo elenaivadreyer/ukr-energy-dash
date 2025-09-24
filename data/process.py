@@ -178,11 +178,31 @@ def assign_oblasts(
 
     gdf_oblasts["oblast_name_en"] = gdf_oblasts["oblast_name_en"].replace(swap_dict)
 
-    # Spatial join (stations to oblasts)
+    # Reproject stations
     stations = stations_gdf.to_crs(gdf_oblasts.crs)
-    matched = gpd.sjoin(stations, gdf_oblasts, how="left", predicate="within").drop(columns=["index_right"])
 
-    return matched, gdf_oblasts
+    # First pass: strict 'within'
+    matched_within = gpd.sjoin(stations, gdf_oblasts, how="left", predicate="within").drop(columns=["index_right"])
+
+    # Find stations that weren't matched
+    unmatched = matched_within[matched_within["oblast_name_en"].isna()].copy()
+
+    if not unmatched.empty:
+        # Second pass: more relaxed 'intersects'
+        matched_intersects = gpd.sjoin(
+            unmatched.drop(columns=["oblast_name_en"]),
+            gdf_oblasts,
+            how="left",
+            predicate="intersects",
+        ).drop(columns=["index_right"])
+
+        # If multiple matches per station, keep the first
+        matched_intersects = matched_intersects.groupby(matched_intersects.index).first()
+
+        # Fill NaNs in the first pass with results from intersects
+        matched_within.loc[matched_intersects.index, "oblast_name_en"] = matched_intersects["oblast_name_en"]
+
+    return matched_within, gdf_oblasts
 
 
 def match_with_gppd(ukraine_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
