@@ -53,7 +53,7 @@ def get_header_with_buttons() -> html.Div:
         children=[
             html.Div(
                 [
-                    html.H1("Ukraine Energy Infrastrcuture Dashboard", className="title-section"),
+                    html.H1("Ukraine Energy Infrastructure Dashboard", className="title-section"),
                 ],
                 className="header-title",
             ),
