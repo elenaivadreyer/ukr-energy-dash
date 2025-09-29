@@ -385,6 +385,45 @@ body {
     margin-bottom: 0;
 }
 
+/* Power source filter styling */
+.power-filter-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.power-filter-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+.power-filter-radio label {
+    font-size: 13px;
+    font-weight: 400;
+    color: #495057;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.power-filter-radio label:hover {
+    background-color: #e9ecef;
+}
+
+.power-filter-radio input[type="radio"] {
+    accent-color: #007bff;
+}
+
+.power-filter-radio input[type="radio"]:checked + span {
+    color: #007bff;
+    font-weight: 500;
+}
+
 
 .station-details-container {
     margin-top: 20px;

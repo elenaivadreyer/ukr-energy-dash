@@ -123,6 +123,28 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                         labelStyle={"margin-left": "6px"},
                     ),
                     dcc.Store(id="gppd-filter-store", data={"enabled": False}),
+                    # Power source type filter
+                    html.Div(
+                        [
+                            html.H6("Power Source Type", className="power-filter-title"),
+                            dcc.RadioItems(
+                                id="power-source-filter",
+                                options=[
+                                    {"label": "All Sources", "value": "all"},
+                                    {"label": "Renewable Energy", "value": "renewable"},
+                                    {"label": "Fossil Fuels", "value": "fossil"},
+                                    {"label": "Nuclear", "value": "nuclear"},
+                                ],
+                                value="all",  # default to show all
+                                className="power-filter-radio",
+                                inputStyle={"margin-right": "8px"},
+                                labelStyle={"margin-bottom": "6px", "display": "block"},
+                            ),
+                            dcc.Store(id="power-source-filter-store", data={"type": "all"}),
+                        ],
+                        className="power-filter-container",
+                        style={"margin-top": "12px", "margin-bottom": "15px"},
+                    ),
                 ],
                 className="dropdown-block",
                 style={"margin-bottom": "15px"},
