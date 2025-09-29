@@ -23,13 +23,14 @@ from components.utils import default_map_figure, generate_map_figure, get_statio
 from layouts.layout_main import get_main_layout, unique_oblasts
 
 
-def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str) -> gpd.GeoDataFrame:
+def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, include_substations: bool = True) -> gpd.GeoDataFrame:
     """
     Apply power source type filter to stations data.
 
     Args:
         stations_df: GeoDataFrame containing station data
         filter_type: Type of filter to apply ('renewable', 'fossil', 'nuclear')
+        include_substations: Whether to include substations in the filtered result
 
     Returns:
         Filtered GeoDataFrame
@@ -42,38 +43,39 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str) 
     renewable = {"solar", "hydro", "wind", "biomass", "biogas", "waste", "wood"}
     fossil = {"coal", "gas", "oil", "diesel", "mazut"}
 
-    # Always include substations
-    substations_df = stations_df[stations_df["power"] == "substation"]
+    # Get plants only first
     plants_df = stations_df[stations_df["power"] == "plant"]
 
     if filter_type == "renewable":
         # Filter for renewable plants
-        renewable_plants = plants_df[
+        filtered_plants = plants_df[
             plants_df["plant:source"].apply(
                 lambda sources: any(fuel in renewable for fuel in str(sources).split(";")) if pd.notna(sources) else False
             )
         ]
-        return pd.concat([renewable_plants, substations_df], ignore_index=True)
-
     elif filter_type == "fossil":
         # Filter for fossil fuel plants
-        fossil_plants = plants_df[
+        filtered_plants = plants_df[
             plants_df["plant:source"].apply(
                 lambda sources: any(fuel in fossil for fuel in str(sources).split(";")) if pd.notna(sources) else False
             )
         ]
-        return pd.concat([fossil_plants, substations_df], ignore_index=True)
-
     elif filter_type == "nuclear":
         # Filter for nuclear plants
-        nuclear_plants = plants_df[
+        filtered_plants = plants_df[
             plants_df["plant:source"].apply(
                 lambda sources: "nuclear" in str(sources).split(";") if pd.notna(sources) else False
             )
         ]
-        return pd.concat([nuclear_plants, substations_df], ignore_index=True)
+    else:
+        filtered_plants = plants_df
 
-    return stations_df
+    # Add substations if requested
+    if include_substations:
+        substations_df = stations_df[stations_df["power"] == "substation"]
+        return pd.concat([filtered_plants, substations_df], ignore_index=True)
+    else:
+        return filtered_plants
 
 # ================= Load Data =================
 stations_df = gpd.read_file("assets/data/power_stations_with_oblasts.geojson").set_geometry("geometry")
@@ -141,6 +143,21 @@ def store_gppd_filter(value: list[str]) -> dict[str, bool]:
     return {"enabled": "gppd" in value}
 
 
+@app.callback(Output("substations-filter-store", "data"), Input("substations-filter", "value"))
+def store_substations_filter(value: list[str]) -> dict[str, bool]:
+    """
+    Store substations filter state in dcc.Store component.
+
+    Args:
+        value: List of selected filter values
+
+    Returns:
+        Dictionary with enabled state for substations filter
+
+    """
+    return {"enabled": "substations" in value}
+
+
 @app.callback(Output("power-source-filter-store", "data"), Input("power-source-filter", "value"))
 def store_power_source_filter(value: str) -> dict[str, str]:
     """
@@ -156,6 +173,31 @@ def store_power_source_filter(value: str) -> dict[str, str]:
     return {"type": value}
 
 
+@app.callback(
+    [Output("substations-filter", "value"), Output("substations-filter", "options")],
+    Input("power-source-filter", "value"),
+    State("substations-filter", "value"),
+)
+def update_substations_filter(power_source: str, current_substations: list[str]) -> tuple[list[str], list[dict]]:
+    """
+    Automatically turn off substations when power source is not 'all'.
+
+    Args:
+        power_source: Currently selected power source filter value
+        current_substations: Current substations filter value
+
+    Returns:
+        Tuple of (new substations value, substations options with disabled state)
+
+    """
+    if power_source != "all":
+        # When power source is filtered, turn off substations
+        return [], [{"label": "", "value": "substations", "disabled": True}]
+    else:
+        # When showing all sources, enable substations
+        return current_substations, [{"label": "", "value": "substations", "disabled": False}]
+
+
 # ================= Map Callback =================
 @app.callback(
     Output("map-display", "figure"),
@@ -166,6 +208,7 @@ def store_power_source_filter(value: str) -> dict[str, str]:
         Input("map-display", "selectedData"),
         Input("gppd-filter-store", "data"),
         Input("power-source-filter-store", "data"),
+        Input("substations-filter-store", "data"),
     ],
     State("map-view-store-mainpage", "data"),
     prevent_initial_call=False,
@@ -177,6 +220,7 @@ def update_map(
     selected_data: dict[str, Any] | None,
     gppd_store: dict[str, bool],
     power_source_store: dict[str, str],
+    substations_store: dict[str, bool],
     store_data: dict[str, Any] | None,
 ) -> dict[str, Any]:
     """
@@ -189,6 +233,7 @@ def update_map(
         selected_data: Data from lasso/box selection
         gppd_store: GPPD filter state
         power_source_store: Power source filter state
+        substations_store: Substations filter state
         store_data: Stored map view state
 
     Returns:
@@ -207,7 +252,11 @@ def update_map(
     # 🔹 Apply power source filter
     if power_source_store and power_source_store.get("type") != "all":
         filter_type = power_source_store.get("type")
-        filtered_stations = _apply_power_source_filter(filtered_stations, filter_type)
+        filtered_stations = _apply_power_source_filter(filtered_stations, filter_type, include_substations=False)
+    else:
+        # 🔹 Apply substations filter only when showing all power sources
+        if substations_store and not substations_store.get("enabled"):
+            filtered_stations = filtered_stations[filtered_stations["power"] != "substation"]
 
     # ---------------- Map Logic ----------------
     if "map-display.relayoutData" in triggered:
@@ -273,6 +322,7 @@ def update_map(
         Input("oblast-dropdown", "value"),
         Input("gppd-filter-store", "data"),
         Input("power-source-filter-store", "data"),
+        Input("substations-filter-store", "data"),
     ],
     prevent_initial_call=False,
 )
@@ -282,6 +332,7 @@ def update_station_details(
     selected_oblast: str | None,
     gppd_filter: dict[str, bool] | None,
     power_source_filter: dict[str, str] | None,
+    substations_filter: dict[str, bool] | None,
 ) -> html.Div | str:
     """
     Update station details panel based on map clicks and interactions.
@@ -319,6 +370,7 @@ def update_station_details(
     Input("oblast-dropdown", "value"),
     Input("gppd-filter-store", "data"),
     Input("power-source-filter-store", "data"),
+    Input("substations-filter-store", "data"),
     Input("map-display", "selectedData"),
     prevent_initial_call=False,
 )
@@ -326,6 +378,7 @@ def update_table(
     selected_oblast: str | None, 
     gppd_filter: dict[str, bool] | None, 
     power_source_filter: dict[str, str] | None,
+    substations_filter: dict[str, bool] | None,
     selected_data: dict[str, Any] | None
 ) -> list[dict[str, Any]]:
     """
@@ -335,6 +388,7 @@ def update_table(
         selected_oblast: Currently selected oblast from dropdown
         gppd_filter: GPPD filter state
         power_source_filter: Power source filter state
+        substations_filter: Substations filter state
         selected_data: Data from lasso/box selection on map
 
     Returns:
@@ -354,7 +408,11 @@ def update_table(
     # apply power source filter
     if power_source_filter and power_source_filter.get("type") != "all":
         filter_type = power_source_filter.get("type")
-        df = _apply_power_source_filter(df, filter_type)
+        df = _apply_power_source_filter(df, filter_type, include_substations=False)
+    else:
+        # apply substations filter only when showing all power sources
+        if substations_filter and not substations_filter.get("enabled"):
+            df = df[df["power"] != "substation"]
 
     # filter by lasso selection
     if selected_data and "points" in selected_data:

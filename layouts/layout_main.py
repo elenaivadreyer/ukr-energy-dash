@@ -114,41 +114,77 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
             html.Div(
                 [
                     html.H6("Filters", className="dropdown-title"),
-                    # GPPD filter
-                    dcc.Checklist(
-                        id="gppd-filter",
-                        options=[{"label": "Global Power Plant Database (GPPD)", "value": "gppd"}],
-                        value=[],  # default unchecked
-                        inputStyle={"margin-right": "6px"},
-                        labelStyle={"margin-left": "6px"},
-                    ),
-                    dcc.Store(id="gppd-filter-store", data={"enabled": False}),
-                    # Power source type filter
+                    # Switch filters row
                     html.Div(
                         [
-                            html.H6("Power Source Type", className="power-filter-title"),
-                            dcc.RadioItems(
-                                id="power-source-filter",
-                                options=[
-                                    {"label": "All Sources", "value": "all"},
-                                    {"label": "Renewable Energy", "value": "renewable"},
-                                    {"label": "Fossil Fuels", "value": "fossil"},
-                                    {"label": "Nuclear", "value": "nuclear"},
+                            # GPPD switch
+                            html.Div(
+                                [
+                                    html.Label("GPPD Validation", className="switch-label"),
+                                    html.Div(
+                                        [
+                                            dcc.Checklist(
+                                                id="gppd-filter",
+                                                options=[{"label": "", "value": "gppd"}],
+                                                value=[],  # default unchecked
+                                                className="switch-checkbox",
+                                            ),
+                                        ],
+                                        className="switch-container",
+                                    ),
                                 ],
-                                value="all",  # default to show all
-                                className="power-filter-radio",
-                                inputStyle={"margin-right": "8px"},
-                                labelStyle={"margin-bottom": "6px", "display": "block"},
+                                className="switch-item",
                             ),
-                            dcc.Store(id="power-source-filter-store", data={"type": "all"}),
+                            # Substations switch
+                            html.Div(
+                                [
+                                    html.Label("Show Substations", className="switch-label"),
+                                    html.Div(
+                                        [
+                                            dcc.Checklist(
+                                                id="substations-filter",
+                                                options=[{"label": "", "value": "substations"}],
+                                                value=["substations"],  # default checked
+                                                className="switch-checkbox",
+                                            ),
+                                        ],
+                                        className="switch-container",
+                                    ),
+                                ],
+                                className="switch-item",
+                            ),
                         ],
-                        className="power-filter-container",
-                        style={"margin-top": "12px", "margin-bottom": "15px"},
+                        className="switches-row",
+                        style={"margin-bottom": "15px"},
                     ),
+                    dcc.Store(id="gppd-filter-store", data={"enabled": False}),
+                    dcc.Store(id="substations-filter-store", data={"enabled": True}),
                 ],
                 className="dropdown-block",
                 style={"margin-bottom": "15px"},
             ),  # adds spacing after filters
+            # Power source dropdown filter - similar to oblast
+            html.Div(
+                [
+                    html.H6("Power Source Type", className="dropdown-title"),
+                    dcc.Dropdown(
+                        id="power-source-filter",
+                        options=[
+                            {"label": "All Sources", "value": "all"},
+                            {"label": "Renewable Energy", "value": "renewable"},
+                            {"label": "Fossil Fuels", "value": "fossil"},
+                            {"label": "Nuclear", "value": "nuclear"},
+                        ],
+                        value="all",  # default to show all
+                        className="dropdown-style",
+                        clearable=False,
+                        placeholder="Select power source type",
+                    ),
+                    dcc.Store(id="power-source-filter-store", data={"type": "all"}),
+                ],
+                className="dropdown-block",
+                style={"margin-bottom": "15px"},
+            ),
             # Oblast dropdown - default None means "All Ukraine"
             html.Div(
                 [
