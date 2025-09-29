@@ -158,19 +158,80 @@ def store_substations_filter(value: list[str]) -> dict[str, bool]:
     return {"enabled": "substations" in value}
 
 
-@app.callback(Output("power-source-filter-store", "data"), Input("power-source-filter", "value"))
-def store_power_source_filter(value: str) -> dict[str, str]:
+@app.callback(
+    [
+        Output("power-source-filter-store", "data"),
+        Output("power-source-all", "className"),
+        Output("power-source-renewable", "className"),
+        Output("power-source-fossil", "className"),
+        Output("power-source-nuclear", "className"),
+    ],
+    [
+        Input("power-source-all", "n_clicks"),
+        Input("power-source-renewable", "n_clicks"),
+        Input("power-source-fossil", "n_clicks"),
+        Input("power-source-nuclear", "n_clicks"),
+    ],
+)
+def update_power_source_filter(all_clicks, renewable_clicks, fossil_clicks, nuclear_clicks):
     """
-    Store power source filter state in dcc.Store component.
+    Update power source filter based on button clicks.
 
     Args:
-        value: Selected filter value
+        all_clicks: Number of clicks on "All Sources" button
+        renewable_clicks: Number of clicks on "Renewable" button
+        fossil_clicks: Number of clicks on "Fossil Fuels" button
+        nuclear_clicks: Number of clicks on "Nuclear" button
 
     Returns:
-        Dictionary with type state for power source filter
+        Tuple of (store_data, all_className, renewable_className, fossil_className, nuclear_className)
 
     """
-    return {"type": value}
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        # Default state
+        return (
+            {"type": "all"},
+            "power-source-btn power-source-btn-active",
+            "power-source-btn",
+            "power-source-btn",
+            "power-source-btn",
+        )
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    
+    # Reset all button classes
+    base_class = "power-source-btn"
+    active_class = "power-source-btn power-source-btn-active"
+    
+    all_class = base_class
+    renewable_class = base_class
+    fossil_class = base_class
+    nuclear_class = base_class
+    
+    if button_id == "power-source-all":
+        all_class = active_class
+        selected_type = "all"
+    elif button_id == "power-source-renewable":
+        renewable_class = active_class
+        selected_type = "renewable"
+    elif button_id == "power-source-fossil":
+        fossil_class = active_class
+        selected_type = "fossil"
+    elif button_id == "power-source-nuclear":
+        nuclear_class = active_class
+        selected_type = "nuclear"
+    else:
+        all_class = active_class
+        selected_type = "all"
+    
+    return (
+        {"type": selected_type},
+        all_class,
+        renewable_class,
+        fossil_class,
+        nuclear_class,
+    )
 
 
 @app.callback(
@@ -323,6 +384,8 @@ def update_map(
         Input("gppd-filter-store", "data"),
         Input("power-source-filter-store", "data"),
         Input("substations-filter-store", "data"),
+        Input("map-display", "selectedData"),
+        Input("stations-table", "active_cell"),
     ],
     prevent_initial_call=False,
 )
@@ -333,6 +396,8 @@ def update_station_details(
     gppd_filter: dict[str, bool] | None,
     power_source_filter: dict[str, str] | None,
     substations_filter: dict[str, bool] | None,
+    selected_data: dict[str, Any] | None,
+    active_cell: dict[str, Any] | None,
 ) -> html.Div | str:
     """
     Update station details panel based on map clicks and interactions.
@@ -342,6 +407,10 @@ def update_station_details(
         relayout_data: Data from map zoom/pan events
         selected_oblast: Currently selected oblast
         gppd_filter: GPPD filter state
+        power_source_filter: Power source filter state
+        substations_filter: Substations filter state
+        selected_data: Data from lasso/box selection
+        active_cell: Active cell in the table
 
     Returns:
         HTML Div with station details or message string
@@ -350,8 +419,16 @@ def update_station_details(
     ctx = dash.callback_context
     triggered = ctx.triggered[0]["prop_id"] if ctx.triggered else ""
 
-    # Clear station details when dropdown changes, map is manipulated (zoom/pan), or filters change
-    if "oblast-dropdown" in triggered or "relayoutData" in triggered or "gppd-filter-store" in triggered:
+    # Clear station details when any filter changes, map is manipulated, table is interacted with, or lasso selection is made
+    if (
+        "oblast-dropdown" in triggered
+        or "relayoutData" in triggered
+        or "gppd-filter-store" in triggered
+        or "power-source-filter-store" in triggered
+        or "substations-filter-store" in triggered
+        or "selectedData" in triggered
+        or "active_cell" in triggered
+    ):
         return ""
 
     if click_data and "points" in click_data and len(click_data["points"]) > 0:

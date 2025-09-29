@@ -120,7 +120,7 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                             # GPPD switch
                             html.Div(
                                 [
-                                    html.Label("GPPD Validation", className="switch-label"),
+                                    html.Label("GPPD Validation", className="switch-label-inline"),
                                     html.Div(
                                         [
                                             dcc.Checklist(
@@ -130,15 +130,15 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                                                 className="switch-checkbox",
                                             ),
                                         ],
-                                        className="switch-container",
+                                        className="switch-container-small",
                                     ),
                                 ],
-                                className="switch-item",
+                                className="switch-item-inline",
                             ),
                             # Substations switch
                             html.Div(
                                 [
-                                    html.Label("Show Substations", className="switch-label"),
+                                    html.Label("Show Substations", className="switch-label-inline"),
                                     html.Div(
                                         [
                                             dcc.Checklist(
@@ -148,13 +148,13 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                                                 className="switch-checkbox",
                                             ),
                                         ],
-                                        className="switch-container",
+                                        className="switch-container-small",
                                     ),
                                 ],
-                                className="switch-item",
+                                className="switch-item-inline",
                             ),
                         ],
-                        className="switches-row",
+                        className="switches-row-inline",
                         style={"margin-bottom": "15px"},
                     ),
                     dcc.Store(id="gppd-filter-store", data={"enabled": False}),
@@ -163,22 +163,50 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                 className="dropdown-block",
                 style={"margin-bottom": "15px"},
             ),  # adds spacing after filters
-            # Power source dropdown filter - similar to oblast
+            # Power source button filters with icons
             html.Div(
                 [
                     html.H6("Power Source Type", className="dropdown-title"),
-                    dcc.Dropdown(
-                        id="power-source-filter",
-                        options=[
-                            {"label": "All Sources", "value": "all"},
-                            {"label": "Renewable Energy", "value": "renewable"},
-                            {"label": "Fossil Fuels", "value": "fossil"},
-                            {"label": "Nuclear", "value": "nuclear"},
+                    html.Div(
+                        [
+                            html.Button(
+                                [
+                                    html.I(className="fas fa-globe", style={"margin-right": "6px"}),
+                                    "All Sources"
+                                ],
+                                id="power-source-all",
+                                className="power-source-btn power-source-btn-active",
+                                n_clicks=0,
+                            ),
+                            html.Button(
+                                [
+                                    html.I(className="fas fa-leaf", style={"margin-right": "6px"}),
+                                    "Renewable"
+                                ],
+                                id="power-source-renewable",
+                                className="power-source-btn",
+                                n_clicks=0,
+                            ),
+                            html.Button(
+                                [
+                                    html.I(className="fas fa-fire", style={"margin-right": "6px"}),
+                                    "Fossil Fuels"
+                                ],
+                                id="power-source-fossil",
+                                className="power-source-btn",
+                                n_clicks=0,
+                            ),
+                            html.Button(
+                                [
+                                    html.I(className="fas fa-atom", style={"margin-right": "6px"}),
+                                    "Nuclear"
+                                ],
+                                id="power-source-nuclear",
+                                className="power-source-btn",
+                                n_clicks=0,
+                            ),
                         ],
-                        value="all",  # default to show all
-                        className="dropdown-style",
-                        clearable=False,
-                        placeholder="Select power source type",
+                        className="power-source-buttons",
                     ),
                     dcc.Store(id="power-source-filter-store", data={"type": "all"}),
                 ],
