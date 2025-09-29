@@ -320,8 +320,6 @@ def default_map_figure(stations_df: gpd.GeoDataFrame, outer_ukraine: gpd.GeoData
             bordercolor="rgba(0,0,0,0.2)",
             borderwidth=1,
             font=dict(size=10),
-            itemclick="toggleothers",  # Enable legend interaction
-            itemdoubleclick="toggle",   # Enable double-click to isolate
         ),
     )
     return fig
@@ -400,8 +398,6 @@ def generate_map_figure(
                     bordercolor="rgba(0,0,0,0.2)",
                     borderwidth=1,
                     font=dict(size=10),
-                    itemclick="toggleothers",  # Enable legend interaction
-                    itemdoubleclick="toggle",   # Enable double-click to isolate
                 ),
             )
 
@@ -466,8 +462,6 @@ def generate_map_figure(
                     bordercolor="rgba(0,0,0,0.2)",
                     borderwidth=1,
                     font=dict(size=10),
-                    itemclick="toggleothers",  # Enable legend interaction
-                    itemdoubleclick="toggle",   # Enable double-click to isolate
                 ),
                 dragmode="lasso",
                 hovermode="closest",

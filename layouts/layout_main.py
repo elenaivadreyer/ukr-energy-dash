@@ -180,19 +180,19 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                             ),
                             html.Button(
                                 [
-                                    html.I(className="fas fa-leaf", style={"margin-right": "6px"}),
-                                    "Renewable"
+                                    html.I(className="fas fa-fire", style={"margin-right": "6px"}),
+                                    "Thermal"
                                 ],
-                                id="power-source-renewable",
+                                id="power-source-thermal",
                                 className="power-source-btn",
                                 n_clicks=0,
                             ),
                             html.Button(
                                 [
-                                    html.I(className="fas fa-fire", style={"margin-right": "6px"}),
-                                    "Fossil Fuels"
+                                    html.I(className="fas fa-water", style={"margin-right": "6px"}),
+                                    "Hydro"
                                 ],
-                                id="power-source-fossil",
+                                id="power-source-hydro",
                                 className="power-source-btn",
                                 n_clicks=0,
                             ),
@@ -202,6 +202,15 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                                     "Nuclear"
                                 ],
                                 id="power-source-nuclear",
+                                className="power-source-btn",
+                                n_clicks=0,
+                            ),
+                            html.Button(
+                                [
+                                    html.I(className="fas fa-leaf", style={"margin-right": "6px"}),
+                                    "Renewable"
+                                ],
+                                id="power-source-renewable",
                                 className="power-source-btn",
                                 n_clicks=0,
                             ),

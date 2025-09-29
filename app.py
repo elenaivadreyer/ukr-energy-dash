@@ -29,7 +29,7 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
 
     Args:
         stations_df: GeoDataFrame containing station data
-        filter_type: Type of filter to apply ('renewable', 'fossil', 'nuclear')
+        filter_type: Type of filter to apply ('thermal', 'hydro', 'nuclear', 'renewable')
         include_substations: Whether to include substations in the filtered result
 
     Returns:
@@ -39,25 +39,27 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
     if filter_type == "all":
         return stations_df
 
-    # Define categories
-    renewable = {"solar", "hydro", "wind", "biomass", "biogas", "waste", "wood"}
-    fossil = {"coal", "gas", "oil", "diesel", "mazut"}
+    # Define categories based on new classification
+    thermal = {"coal", "gas", "oil", "diesel", "mazut"}  # All thermal/fossil sources
+    hydro = {"hydro"}
+    nuclear = {"nuclear"}
+    renewable = {"solar", "wind"}  # Only solar and wind as specified
 
     # Get plants only first
     plants_df = stations_df[stations_df["power"] == "plant"]
 
-    if filter_type == "renewable":
-        # Filter for renewable plants
+    if filter_type == "thermal":
+        # Filter for thermal plants (coal, gas, oil, diesel, mazut and combinations)
         filtered_plants = plants_df[
             plants_df["plant:source"].apply(
-                lambda sources: any(fuel in renewable for fuel in str(sources).split(";")) if pd.notna(sources) else False
+                lambda sources: any(fuel in thermal for fuel in str(sources).split(";")) if pd.notna(sources) else False
             )
         ]
-    elif filter_type == "fossil":
-        # Filter for fossil fuel plants
+    elif filter_type == "hydro":
+        # Filter for hydro plants
         filtered_plants = plants_df[
             plants_df["plant:source"].apply(
-                lambda sources: any(fuel in fossil for fuel in str(sources).split(";")) if pd.notna(sources) else False
+                lambda sources: any(fuel in hydro for fuel in str(sources).split(";")) if pd.notna(sources) else False
             )
         ]
     elif filter_type == "nuclear":
@@ -65,6 +67,13 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
         filtered_plants = plants_df[
             plants_df["plant:source"].apply(
                 lambda sources: "nuclear" in str(sources).split(";") if pd.notna(sources) else False
+            )
+        ]
+    elif filter_type == "renewable":
+        # Filter for renewable plants (solar and wind only)
+        filtered_plants = plants_df[
+            plants_df["plant:source"].apply(
+                lambda sources: any(fuel in renewable for fuel in str(sources).split(";")) if pd.notna(sources) else False
             )
         ]
     else:
@@ -162,29 +171,32 @@ def store_substations_filter(value: list[str]) -> dict[str, bool]:
     [
         Output("power-source-filter-store", "data"),
         Output("power-source-all", "className"),
-        Output("power-source-renewable", "className"),
-        Output("power-source-fossil", "className"),
+        Output("power-source-thermal", "className"),
+        Output("power-source-hydro", "className"),
         Output("power-source-nuclear", "className"),
+        Output("power-source-renewable", "className"),
     ],
     [
         Input("power-source-all", "n_clicks"),
-        Input("power-source-renewable", "n_clicks"),
-        Input("power-source-fossil", "n_clicks"),
+        Input("power-source-thermal", "n_clicks"),
+        Input("power-source-hydro", "n_clicks"),
         Input("power-source-nuclear", "n_clicks"),
+        Input("power-source-renewable", "n_clicks"),
     ],
 )
-def update_power_source_filter(all_clicks, renewable_clicks, fossil_clicks, nuclear_clicks):
+def update_power_source_filter(all_clicks, thermal_clicks, hydro_clicks, nuclear_clicks, renewable_clicks):
     """
     Update power source filter based on button clicks.
 
     Args:
         all_clicks: Number of clicks on "All Sources" button
-        renewable_clicks: Number of clicks on "Renewable" button
-        fossil_clicks: Number of clicks on "Fossil Fuels" button
+        thermal_clicks: Number of clicks on "Thermal" button
+        hydro_clicks: Number of clicks on "Hydro" button
         nuclear_clicks: Number of clicks on "Nuclear" button
+        renewable_clicks: Number of clicks on "Renewable" button
 
     Returns:
-        Tuple of (store_data, all_className, renewable_className, fossil_className, nuclear_className)
+        Tuple of (store_data, all_className, thermal_className, hydro_className, nuclear_className, renewable_className)
 
     """
     ctx = dash.callback_context
@@ -193,6 +205,7 @@ def update_power_source_filter(all_clicks, renewable_clicks, fossil_clicks, nucl
         return (
             {"type": "all"},
             "power-source-btn power-source-btn-active",
+            "power-source-btn",
             "power-source-btn",
             "power-source-btn",
             "power-source-btn",
@@ -205,22 +218,26 @@ def update_power_source_filter(all_clicks, renewable_clicks, fossil_clicks, nucl
     active_class = "power-source-btn power-source-btn-active"
     
     all_class = base_class
-    renewable_class = base_class
-    fossil_class = base_class
+    thermal_class = base_class
+    hydro_class = base_class
     nuclear_class = base_class
+    renewable_class = base_class
     
     if button_id == "power-source-all":
         all_class = active_class
         selected_type = "all"
-    elif button_id == "power-source-renewable":
-        renewable_class = active_class
-        selected_type = "renewable"
-    elif button_id == "power-source-fossil":
-        fossil_class = active_class
-        selected_type = "fossil"
+    elif button_id == "power-source-thermal":
+        thermal_class = active_class
+        selected_type = "thermal"
+    elif button_id == "power-source-hydro":
+        hydro_class = active_class
+        selected_type = "hydro"
     elif button_id == "power-source-nuclear":
         nuclear_class = active_class
         selected_type = "nuclear"
+    elif button_id == "power-source-renewable":
+        renewable_class = active_class
+        selected_type = "renewable"
     else:
         all_class = active_class
         selected_type = "all"
@@ -228,9 +245,10 @@ def update_power_source_filter(all_clicks, renewable_clicks, fossil_clicks, nucl
     return (
         {"type": selected_type},
         all_class,
-        renewable_class,
-        fossil_class,
+        thermal_class,
+        hydro_class,
         nuclear_class,
+        renewable_class,
     )
 
 
