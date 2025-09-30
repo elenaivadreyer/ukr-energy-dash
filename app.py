@@ -29,7 +29,7 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
 
     Args:
         stations_df: GeoDataFrame containing station data
-        filter_type: Type of filter to apply ('thermal', 'hydro', 'nuclear', 'renewable')
+        filter_type: Type of filter to apply ('thermal', 'nuclear', 'renewable')
         include_substations: Whether to include substations in the filtered result
 
     Returns:
@@ -40,26 +40,20 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
         return stations_df
 
     # Define categories based on new classification
-    thermal = {"coal", "gas", "oil", "diesel", "mazut"}  # All thermal/fossil sources
-    hydro = {"hydro"}
+    # Thermal: heat-based, usually combustion
+    thermal = {"coal", "gas", "oil", "diesel", "mazut", "biogas", "biomass", "wood", "waste"}
     nuclear = {"nuclear"}
-    renewable = {"solar", "wind"}  # Only solar and wind as specified
+    # Renewables: non-thermal (solar, wind, hydro)
+    renewable = {"solar", "wind", "hydro"}
 
     # Get plants only first
     plants_df = stations_df[stations_df["power"] == "plant"]
 
     if filter_type == "thermal":
-        # Filter for thermal plants (coal, gas, oil, diesel, mazut and combinations)
+        # Filter for thermal plants (all heat-based combustion sources)
         filtered_plants = plants_df[
             plants_df["plant:source"].apply(
                 lambda sources: any(fuel in thermal for fuel in str(sources).split(";")) if pd.notna(sources) else False
-            )
-        ]
-    elif filter_type == "hydro":
-        # Filter for hydro plants
-        filtered_plants = plants_df[
-            plants_df["plant:source"].apply(
-                lambda sources: any(fuel in hydro for fuel in str(sources).split(";")) if pd.notna(sources) else False
             )
         ]
     elif filter_type == "nuclear":
@@ -70,7 +64,7 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
             )
         ]
     elif filter_type == "renewable":
-        # Filter for renewable plants (solar and wind only)
+        # Filter for renewable plants (non-thermal: solar, wind, hydro)
         filtered_plants = plants_df[
             plants_df["plant:source"].apply(
                 lambda sources: any(fuel in renewable for fuel in str(sources).split(";")) if pd.notna(sources) else False
@@ -172,31 +166,28 @@ def store_substations_filter(value: list[str]) -> dict[str, bool]:
         Output("power-source-filter-store", "data"),
         Output("power-source-all", "className"),
         Output("power-source-thermal", "className"),
-        Output("power-source-hydro", "className"),
         Output("power-source-nuclear", "className"),
         Output("power-source-renewable", "className"),
     ],
     [
         Input("power-source-all", "n_clicks"),
         Input("power-source-thermal", "n_clicks"),
-        Input("power-source-hydro", "n_clicks"),
         Input("power-source-nuclear", "n_clicks"),
         Input("power-source-renewable", "n_clicks"),
     ],
 )
-def update_power_source_filter(all_clicks, thermal_clicks, hydro_clicks, nuclear_clicks, renewable_clicks):
+def update_power_source_filter(all_clicks, thermal_clicks, nuclear_clicks, renewable_clicks):
     """
     Update power source filter based on button clicks.
 
     Args:
         all_clicks: Number of clicks on "All Sources" button
         thermal_clicks: Number of clicks on "Thermal" button
-        hydro_clicks: Number of clicks on "Hydro" button
         nuclear_clicks: Number of clicks on "Nuclear" button
         renewable_clicks: Number of clicks on "Renewable" button
 
     Returns:
-        Tuple of (store_data, all_className, thermal_className, hydro_className, nuclear_className, renewable_className)
+        Tuple of (store_data, all_className, thermal_className, nuclear_className, renewable_className)
 
     """
     ctx = dash.callback_context
@@ -205,7 +196,6 @@ def update_power_source_filter(all_clicks, thermal_clicks, hydro_clicks, nuclear
         return (
             {"type": "all"},
             "power-source-btn power-source-btn-active",
-            "power-source-btn",
             "power-source-btn",
             "power-source-btn",
             "power-source-btn",
@@ -219,7 +209,6 @@ def update_power_source_filter(all_clicks, thermal_clicks, hydro_clicks, nuclear
     
     all_class = base_class
     thermal_class = base_class
-    hydro_class = base_class
     nuclear_class = base_class
     renewable_class = base_class
     
@@ -229,9 +218,6 @@ def update_power_source_filter(all_clicks, thermal_clicks, hydro_clicks, nuclear
     elif button_id == "power-source-thermal":
         thermal_class = active_class
         selected_type = "thermal"
-    elif button_id == "power-source-hydro":
-        hydro_class = active_class
-        selected_type = "hydro"
     elif button_id == "power-source-nuclear":
         nuclear_class = active_class
         selected_type = "nuclear"
@@ -246,7 +232,6 @@ def update_power_source_filter(all_clicks, thermal_clicks, hydro_clicks, nuclear
         {"type": selected_type},
         all_class,
         thermal_class,
-        hydro_class,
         nuclear_class,
         renewable_class,
     )
@@ -552,6 +537,27 @@ def generate_excel_download(n_clicks: int | None, table_data: list[dict[str, Any
     return dcc.send_data_frame(
         df.to_excel, f"ukraine_power_stations_osm_{timestamp}.xlsx", index=False, engine="openpyxl"
     )
+
+
+# ================= Auto-scroll Sidebar on Station Click =================
+app.clientside_callback(
+    """
+    function(children) {
+        // Only scroll if children is not empty (station details are shown)
+        if (children && children !== "") {
+            setTimeout(function() {
+                const stationDetails = document.getElementById('station-details');
+                if (stationDetails) {
+                    stationDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("station-details", "data-scroll-trigger"),
+    Input("station-details", "children"),
+)
 
 
 # ================= Run Server =================

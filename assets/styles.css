@@ -514,12 +514,7 @@ body {
 .power-source-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
     gap: 8px;
-}
-
-.power-source-buttons .power-source-btn:nth-child(5) {
-    grid-column: 1 / span 2;
 }
 
 .power-source-btn {

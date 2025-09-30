@@ -189,15 +189,6 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                             ),
                             html.Button(
                                 [
-                                    html.I(className="fas fa-water", style={"margin-right": "6px"}),
-                                    "Hydro"
-                                ],
-                                id="power-source-hydro",
-                                className="power-source-btn",
-                                n_clicks=0,
-                            ),
-                            html.Button(
-                                [
                                     html.I(className="fas fa-atom", style={"margin-right": "6px"}),
                                     "Nuclear"
                                 ],
