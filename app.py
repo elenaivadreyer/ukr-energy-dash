@@ -23,7 +23,9 @@ from components.utils import default_map_figure, generate_map_figure, get_statio
 from layouts.layout_main import get_main_layout, unique_oblasts
 
 
-def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, include_substations: bool = True) -> gpd.GeoDataFrame:
+def _apply_power_source_filter(
+    stations_df: gpd.GeoDataFrame, filter_type: str, include_substations: bool = True
+) -> gpd.GeoDataFrame:
     """
     Apply power source type filter to stations data.
 
@@ -42,7 +44,7 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
     # Define categories based on new classification
     # Thermal: heat-based, usually combustion
     thermal = {"coal", "gas", "oil", "diesel", "mazut", "biogas", "biomass", "wood", "waste"}
-    nuclear = {"nuclear"}
+    # nuclear = {"nuclear"}
     # Renewables: non-thermal (solar, wind, hydro)
     renewable = {"solar", "wind", "hydro"}
 
@@ -67,7 +69,9 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
         # Filter for renewable plants (non-thermal: solar, wind, hydro)
         filtered_plants = plants_df[
             plants_df["plant:source"].apply(
-                lambda sources: any(fuel in renewable for fuel in str(sources).split(";")) if pd.notna(sources) else False
+                lambda sources: any(fuel in renewable for fuel in str(sources).split(";"))
+                if pd.notna(sources)
+                else False
             )
         ]
     else:
@@ -79,6 +83,7 @@ def _apply_power_source_filter(stations_df: gpd.GeoDataFrame, filter_type: str, 
         return pd.concat([filtered_plants, substations_df], ignore_index=True)
     else:
         return filtered_plants
+
 
 # ================= Load Data =================
 stations_df = gpd.read_file("assets/data/power_stations_with_oblasts.geojson").set_geometry("geometry")
@@ -176,7 +181,9 @@ def store_substations_filter(value: list[str]) -> dict[str, bool]:
         Input("power-source-renewable", "n_clicks"),
     ],
 )
-def update_power_source_filter(all_clicks, thermal_clicks, nuclear_clicks, renewable_clicks):
+def update_power_source_filter(
+    all_clicks: int, thermal_clicks: int, nuclear_clicks: int, renewable_clicks: int
+) -> tuple[dict[str, str], str, str, str, str]:
     """
     Update power source filter based on button clicks.
 
@@ -202,16 +209,16 @@ def update_power_source_filter(all_clicks, thermal_clicks, nuclear_clicks, renew
         )
 
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    
+
     # Reset all button classes
     base_class = "power-source-btn"
     active_class = "power-source-btn power-source-btn-active"
-    
+
     all_class = base_class
     thermal_class = base_class
     nuclear_class = base_class
     renewable_class = base_class
-    
+
     if button_id == "power-source-all":
         all_class = active_class
         selected_type = "all"
@@ -227,7 +234,7 @@ def update_power_source_filter(all_clicks, thermal_clicks, nuclear_clicks, renew
     else:
         all_class = active_class
         selected_type = "all"
-    
+
     return (
         {"type": selected_type},
         all_class,
@@ -317,10 +324,9 @@ def update_map(
     if power_source_store and power_source_store.get("type") != "all":
         filter_type = power_source_store.get("type")
         filtered_stations = _apply_power_source_filter(filtered_stations, filter_type, include_substations=False)
-    else:
-        # 🔹 Apply substations filter only when showing all power sources
-        if substations_store and not substations_store.get("enabled"):
-            filtered_stations = filtered_stations[filtered_stations["power"] != "substation"]
+    # 🔹 Apply substations filter only when showing all power sources
+    elif substations_store and not substations_store.get("enabled"):
+        filtered_stations = filtered_stations[filtered_stations["power"] != "substation"]
 
     # ---------------- Map Logic ----------------
     if "map-display.relayoutData" in triggered:
@@ -455,11 +461,11 @@ def update_station_details(
     prevent_initial_call=False,
 )
 def update_table(
-    selected_oblast: str | None, 
-    gppd_filter: dict[str, bool] | None, 
+    selected_oblast: str | None,
+    gppd_filter: dict[str, bool] | None,
     power_source_filter: dict[str, str] | None,
     substations_filter: dict[str, bool] | None,
-    selected_data: dict[str, Any] | None
+    selected_data: dict[str, Any] | None,
 ) -> list[dict[str, Any]]:
     """
     Update the stations table based on filters and selections.
@@ -489,10 +495,9 @@ def update_table(
     if power_source_filter and power_source_filter.get("type") != "all":
         filter_type = power_source_filter.get("type")
         df = _apply_power_source_filter(df, filter_type, include_substations=False)
-    else:
-        # apply substations filter only when showing all power sources
-        if substations_filter and not substations_filter.get("enabled"):
-            df = df[df["power"] != "substation"]
+    # apply substations filter only when showing all power sources
+    elif substations_filter and not substations_filter.get("enabled"):
+        df = df[df["power"] != "substation"]
 
     # filter by lasso selection
     if selected_data and "points" in selected_data:
@@ -553,7 +558,7 @@ app.clientside_callback(
                     const sidebarRect = sidebar.getBoundingClientRect();
                     const detailsRect = stationDetails.getBoundingClientRect();
                     const scrollOffset = detailsRect.top - sidebarRect.top + sidebar.scrollTop;
-                    
+
                     // Scroll the sidebar container, not the whole page
                     sidebar.scrollTo({
                         top: scrollOffset,

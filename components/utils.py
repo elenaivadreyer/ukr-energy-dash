@@ -151,7 +151,7 @@ def _add_station_markers_with_legend(fig: go.Figure, stations_df: gpd.GeoDataFra
     power_source_categories = {
         # Renewables
         "solar": "Solar",
-        "wind": "Wind", 
+        "wind": "Wind",
         "hydro": "Hydro",
         "biogas": "Biogas",
         "biomass": "Biomass",
@@ -166,7 +166,7 @@ def _add_station_markers_with_legend(fig: go.Figure, stations_df: gpd.GeoDataFra
         "diesel": "Diesel",
         "mazut": "Mazut",
     }
-    
+
     # Plants - group by power source
     plants_df = stations_df[stations_df["power"] == "plant"]
     if not plants_df.empty:
@@ -175,13 +175,13 @@ def _add_station_markers_with_legend(fig: go.Figure, stations_df: gpd.GeoDataFra
             source_plants = plants_df[plants_df["plant:source"] == source]
             if source_plants.empty:
                 continue
-                
+
             lats, lons, indices, hovertexts = [], [], [], []
-            
+
             for idx, row in source_plants.iterrows():
                 geom = row.geometry
                 lat, lon = (geom.centroid.y, geom.centroid.x) if not isinstance(geom, Point) else (geom.y, geom.x)
-                
+
                 lats.append(lat)
                 lons.append(lon)
                 indices.append(idx)
@@ -189,7 +189,7 @@ def _add_station_markers_with_legend(fig: go.Figure, stations_df: gpd.GeoDataFra
 
             # Get color for this source
             color = power_source_colors.get(source, "#6a3d9a")
-            
+
             fig.add_trace(
                 go.Scattermapbox(
                     lat=lats,
@@ -204,16 +204,16 @@ def _add_station_markers_with_legend(fig: go.Figure, stations_df: gpd.GeoDataFra
                     legendgroup="plants",
                 )
             )
-        
+
         # Handle mixed and other sources
         mixed_plants = plants_df[~plants_df["plant:source"].isin(power_source_categories.keys())]
         if not mixed_plants.empty:
             lats, lons, indices, hovertexts = [], [], [], []
-            
+
             for idx, row in mixed_plants.iterrows():
                 geom = row.geometry
                 lat, lon = (geom.centroid.y, geom.centroid.x) if not isinstance(geom, Point) else (geom.y, geom.x)
-                
+
                 lats.append(lat)
                 lons.append(lon)
                 indices.append(idx)

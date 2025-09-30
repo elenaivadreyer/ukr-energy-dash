@@ -161,7 +161,7 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                     dcc.Store(id="substations-filter-store", data={"enabled": True}),
                 ],
                 className="dropdown-block",
-                style={"margin-bottom": "15px"},
+                style={"margin-top": "5px"},
             ),  # adds spacing after filters
             # Power source button filters with icons
             html.Div(
@@ -170,37 +170,25 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                     html.Div(
                         [
                             html.Button(
-                                [
-                                    html.I(className="fas fa-globe", style={"margin-right": "6px"}),
-                                    "All Sources"
-                                ],
+                                [html.I(className="fas fa-globe", style={"margin-right": "6px"}), "All Sources"],
                                 id="power-source-all",
                                 className="power-source-btn power-source-btn-active",
                                 n_clicks=0,
                             ),
                             html.Button(
-                                [
-                                    html.I(className="fas fa-fire", style={"margin-right": "6px"}),
-                                    "Thermal"
-                                ],
+                                [html.I(className="fas fa-fire", style={"margin-right": "6px"}), "Thermal"],
                                 id="power-source-thermal",
                                 className="power-source-btn",
                                 n_clicks=0,
                             ),
                             html.Button(
-                                [
-                                    html.I(className="fas fa-atom", style={"margin-right": "6px"}),
-                                    "Nuclear"
-                                ],
+                                [html.I(className="fas fa-atom", style={"margin-right": "6px"}), "Nuclear"],
                                 id="power-source-nuclear",
                                 className="power-source-btn",
                                 n_clicks=0,
                             ),
                             html.Button(
-                                [
-                                    html.I(className="fas fa-leaf", style={"margin-right": "6px"}),
-                                    "Renewable"
-                                ],
+                                [html.I(className="fas fa-leaf", style={"margin-right": "6px"}), "Renewable"],
                                 id="power-source-renewable",
                                 className="power-source-btn",
                                 n_clicks=0,
@@ -211,7 +199,7 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                     dcc.Store(id="power-source-filter-store", data={"type": "all"}),
                 ],
                 className="dropdown-block",
-                style={"margin-bottom": "15px"},
+                style={"margin-top": "10px"},
             ),
             # Oblast dropdown - default None means "All Ukraine"
             html.Div(
@@ -228,6 +216,7 @@ def get_main_content_with_oblast(unique_oblasts: list[str], stations_df: gpd.Geo
                     ),
                 ],
                 className="dropdown-block",
+                style={"margin-top": "15px"},
             ),
             # Station details from click
             html.Div(id="station-details", children=[], className="station-details-container"),

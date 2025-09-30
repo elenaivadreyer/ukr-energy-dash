@@ -158,6 +158,8 @@ ignore = [
     "D203", #creates issues with formatter
     "D401", #non-imperative-mood: Not a desired rule, therefore excluded
     "PLR0912", #Too many lines in module
+    "C408", #Unnecessary list comprehension (use generator expression) --> not a desired rule, therefore excluded
+    "W293", #blank line contains whitespace
 ]
 
 # Allows unused variables when underscore-prefixed
