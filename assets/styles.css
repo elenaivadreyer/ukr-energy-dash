@@ -373,8 +373,24 @@ body {
 }
 
 .dropdown-title {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 700;
+}
+
+/* Dropdown option text styling */
+.dropdown-style .Select-menu-outer,
+.dropdown-style .VirtualizedSelectOption,
+#oblast-dropdown .Select-menu-outer,
+#oblast-dropdown .VirtualizedSelectOption {
+    font-size: 11px;
+}
+
+/* For newer Dash versions using react-select */
+.dropdown-style .css-26l3qy-menu,
+.dropdown-style .css-1n7v3ny-option,
+#oblast-dropdown .css-26l3qy-menu,
+#oblast-dropdown .css-1n7v3ny-option {
+    font-size: 11px;
 }
 
 .dropdown-style {
