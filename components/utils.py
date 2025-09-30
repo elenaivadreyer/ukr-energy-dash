@@ -60,15 +60,28 @@ def hex_to_rgba(hex_color: str, alpha: float = 0.25) -> str:
     return f"rgba({r},{g},{b},{alpha})"
 
 
-def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
+def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame, show_legend: bool = False) -> None:
     """
     Add plants and substations to the map as separate traces.
 
     Args:
         fig: Plotly figure object to add markers to
         stations_df: GeoDataFrame containing station data with geometry and attributes
+        show_legend: Whether to show legend with separate traces for each power source
 
     """
+    if show_legend:
+        # Create separate traces for each power source for elegant legend
+        _add_station_markers_with_legend(fig, stations_df)
+    else:
+        # Original implementation - single trace per power type
+        _add_station_markers_single_trace(fig, stations_df)
+
+    return fig
+
+
+def _add_station_markers_single_trace(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
+    """Original implementation with single trace per power type."""
     # Plants
     plants_df = stations_df[stations_df["power"] == "plant"]
     if not plants_df.empty:
@@ -96,6 +109,7 @@ def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
                 hoverinfo="text",
                 hovertext=hovertexts,
                 name="Plants",
+                showlegend=False,
             )
         )
 
@@ -125,11 +139,132 @@ def add_station_markers(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
                 hovertext=hovertexts,
                 hoverinfo="text",
                 customdata=subs_df.index,
-                name="Substation",
+                name="Substations",
+                showlegend=False,
             )
         )
 
-    return fig
+
+def _add_station_markers_with_legend(fig: go.Figure, stations_df: gpd.GeoDataFrame) -> None:
+    """Create separate traces for each power source for elegant legend."""
+    # Define power source categories with display names
+    power_source_categories = {
+        # Renewables
+        "solar": "Solar",
+        "wind": "Wind",
+        "hydro": "Hydro",
+        "biogas": "Biogas",
+        "biomass": "Biomass",
+        "wood": "Wood",
+        "waste": "Waste",
+        # Nuclear
+        "nuclear": "Nuclear",
+        # Fossil fuels
+        "coal": "Coal",
+        "gas": "Gas",
+        "oil": "Oil",
+        "diesel": "Diesel",
+        "mazut": "Mazut",
+    }
+
+    # Plants - group by power source
+    plants_df = stations_df[stations_df["power"] == "plant"]
+    if not plants_df.empty:
+        # Group stations by power source
+        for source, display_name in power_source_categories.items():
+            source_plants = plants_df[plants_df["plant:source"] == source]
+            if source_plants.empty:
+                continue
+
+            lats, lons, indices, hovertexts = [], [], [], []
+
+            for idx, row in source_plants.iterrows():
+                geom = row.geometry
+                lat, lon = (geom.centroid.y, geom.centroid.x) if not isinstance(geom, Point) else (geom.y, geom.x)
+
+                lats.append(lat)
+                lons.append(lon)
+                indices.append(idx)
+                hovertexts.append(row.get("station_name_en", "Unknown"))
+
+            # Get color for this source
+            color = power_source_colors.get(source, "#6a3d9a")
+
+            fig.add_trace(
+                go.Scattermapbox(
+                    lat=lats,
+                    lon=lons,
+                    mode="markers",
+                    marker={"size": 8, "color": color, "symbol": "circle"},
+                    customdata=indices,
+                    hoverinfo="text",
+                    hovertext=hovertexts,
+                    name=display_name,
+                    showlegend=True,
+                    legendgroup="plants",
+                )
+            )
+
+        # Handle mixed and other sources
+        mixed_plants = plants_df[~plants_df["plant:source"].isin(power_source_categories.keys())]
+        if not mixed_plants.empty:
+            lats, lons, indices, hovertexts = [], [], [], []
+
+            for idx, row in mixed_plants.iterrows():
+                geom = row.geometry
+                lat, lon = (geom.centroid.y, geom.centroid.x) if not isinstance(geom, Point) else (geom.y, geom.x)
+
+                lats.append(lat)
+                lons.append(lon)
+                indices.append(idx)
+                hovertexts.append(row.get("station_name_en", "Unknown"))
+
+            fig.add_trace(
+                go.Scattermapbox(
+                    lat=lats,
+                    lon=lons,
+                    mode="markers",
+                    marker={"size": 8, "color": "#6a3d9a", "symbol": "circle"},
+                    customdata=indices,
+                    hoverinfo="text",
+                    hovertext=hovertexts,
+                    name="Mixed/Other",
+                    showlegend=True,
+                    legendgroup="plants",
+                )
+            )
+
+    # Substations - single trace
+    subs_df = stations_df[stations_df["power"] == "substation"]
+    if not subs_df.empty:
+        lats, lons, hovertexts = [], [], []
+        for _, row in subs_df.iterrows():
+            geom = row.geometry
+            # use centroid for polygon or point
+            lat, lon = (geom.centroid.y, geom.centroid.x) if not geom.geom_type == "Point" else (geom.y, geom.x)
+            lats.append(lat)
+            lons.append(lon)
+            hovertexts.append(row.get("station_name_en", "Unknown"))
+
+        fig.add_trace(
+            go.Scattermapbox(
+                lat=lats,
+                lon=lons,
+                mode="markers",
+                marker={
+                    "size": 6,
+                    "color": "#382b2b",  # fill
+                    "symbol": "circle",  # only symbol that supports color/size
+                },
+                text=hovertexts,
+                hovertext=hovertexts,
+                hoverinfo="text",
+                customdata=subs_df.index,
+                name="Substations",
+                showlegend=True,
+                legendgroup="substations",
+            )
+        )
 
 
 # Default map
@@ -167,14 +302,25 @@ def default_map_figure(stations_df: gpd.GeoDataFrame, outer_ukraine: gpd.GeoData
                     )
                 )
 
-    # markers (one trace)
-    fig = add_station_markers(fig, stations_df)
+    # markers with legend
+    fig = add_station_markers(fig, stations_df, show_legend=True)
 
     # always set a full mapbox layout so centering works reliably
     fig.update_layout(
         mapbox={"style": "carto-positron", "center": {"lat": 48.3794, "lon": 31.1656}, "zoom": 5},
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        showlegend=False,
+        showlegend=True,
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=0.98,
+            xanchor="left",
+            x=0.01,
+            bgcolor="rgba(255,255,255,0.9)",
+            bordercolor="rgba(0,0,0,0.2)",
+            borderwidth=1,
+            font=dict(size=10),
+        ),
     )
     return fig
 
@@ -235,13 +381,24 @@ def generate_map_figure(
                 lat, lon = c.y, c.x
 
             # Add all stations as markers
-            fig = add_station_markers(fig, stations_df)
+            fig = add_station_markers(fig, stations_df, show_legend=True)
 
             # Zoom to clicked station
             fig.update_layout(
                 mapbox={"center": {"lat": lat, "lon": lon}, "zoom": 15, "style": "carto-positron"},
                 margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                showlegend=False,
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.98,
+                    xanchor="left",
+                    x=0.01,
+                    bgcolor="rgba(255,255,255,0.9)",
+                    bordercolor="rgba(0,0,0,0.2)",
+                    borderwidth=1,
+                    font=dict(size=10),
+                ),
             )
 
             # Draw polygon fill if polygonal
@@ -287,14 +444,25 @@ def generate_map_figure(
                     )
             # Add stations inside oblast
             filtered_stations = stations_df[stations_df["oblast_name_en"] == selected_oblast]
-            fig = add_station_markers(fig, filtered_stations)
+            fig = add_station_markers(fig, filtered_stations, show_legend=True)
 
             # Center on oblast centroid
             centroid = filtered_oblast.geometry.unary_union.centroid
             fig.update_layout(
                 mapbox={"center": {"lat": centroid.y, "lon": centroid.x}, "zoom": 7, "style": "carto-positron"},
                 margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                showlegend=False,
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="top",
+                    y=0.98,
+                    xanchor="left",
+                    x=0.01,
+                    bgcolor="rgba(255,255,255,0.9)",
+                    bordercolor="rgba(0,0,0,0.2)",
+                    borderwidth=1,
+                    font=dict(size=10),
+                ),
                 dragmode="lasso",
                 hovermode="closest",
             )
