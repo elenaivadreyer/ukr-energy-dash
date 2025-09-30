@@ -393,6 +393,26 @@ body {
     font-size: 11px;
 }
 
+/* Dropdown selected value and placeholder text */
+.dropdown-style .Select-value-label,
+.dropdown-style .Select-placeholder,
+.dropdown-style .Select-control,
+#oblast-dropdown .Select-value-label,
+#oblast-dropdown .Select-placeholder,
+#oblast-dropdown .Select-control {
+    font-size: 11px;
+}
+
+/* For newer Dash versions - selected value and placeholder */
+.dropdown-style .css-1wa3eu0-placeholder,
+.dropdown-style .css-1uccc91-singleValue,
+.dropdown-style .css-qc6sy-singleValue,
+#oblast-dropdown .css-1wa3eu0-placeholder,
+#oblast-dropdown .css-1uccc91-singleValue,
+#oblast-dropdown .css-qc6sy-singleValue {
+    font-size: 11px;
+}
+
 .dropdown-style {
     margin-bottom: 15px; /* Add some space between dropdowns */
 }
