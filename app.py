@@ -547,8 +547,18 @@ app.clientside_callback(
         if (children && children !== "") {
             setTimeout(function() {
                 const stationDetails = document.getElementById('station-details');
-                if (stationDetails) {
-                    stationDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const sidebar = document.querySelector('.sidebar-container');
+                if (stationDetails && sidebar) {
+                    // Calculate the position of station-details relative to the sidebar
+                    const sidebarRect = sidebar.getBoundingClientRect();
+                    const detailsRect = stationDetails.getBoundingClientRect();
+                    const scrollOffset = detailsRect.top - sidebarRect.top + sidebar.scrollTop;
+                    
+                    // Scroll the sidebar container, not the whole page
+                    sidebar.scrollTo({
+                        top: scrollOffset,
+                        behavior: 'smooth'
+                    });
                 }
             }, 100);
         }
